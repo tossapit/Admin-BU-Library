@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - MeetingRoom</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="bg-gray-100 flex">
+
+    <!-- Sidebar -->
+    <div class="w-[280px] bg-[#1e2124] min-h-screen p-4 fixed left-0 top-0 text-white flex flex-col">
+        <!-- Sidebar Header -->
+        <div class="p-3.5 px-4 flex items-center justify-center gap-2 text-xl font-semibold border-b border-white/10 mb-4">             
+            <img src="/img_home_page/pngegg 2.png" alt="University Logo" class="w-30 h-10 object-contain">         
+        </div>
+        <!-- Navigation Menu -->
+        <ul class="flex flex-col gap-1">
+            <li>
+                <a href="dashBoard.html" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 rounded-lg transition-colors duration-200">
+                    <i data-feather="bar-chart-2" class="w-4 h-4"></i>
+                    Dashboard
+                </a>
+            </li>
+            <!-- MeetingRoom Dropdown -->
+            <li class="space-y-1">
+                <button class="w-full flex items-center justify-between px-4 py-3 text-white/70 hover:bg-white/10 rounded-lg transition-all duration-200" onclick="toggleDropdown('meetingRoom')">
+                    <div class="flex items-center gap-3">
+                        <i data-feather="message-square" class="w-4 h-4"></i>
+                        MeetingRoom
+                    </div>
+                    <i data-feather="chevron-down" class="w-4 h-4 transition-transform duration-200"></i>
+                </button>
+                <ul id="meetingRoom" class="ml-8 space-y-1 text-white/70">
+                    <li><a href="dataMeetingRoom.html" class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">ข้อมูลการจอง</a></li>
+                    <li><a href="#" class="block py-2 px-4 bg-blue-600 rounded-lg transition-colors duration-200">อนุมัติการจอง</a></li>
+                </ul>
+            </li>
+            <!-- MovieRoom Dropdown -->
+            <li class="space-y-1">
+                <button class="w-full flex items-center justify-between px-4 py-3 text-white/70 hover:bg-white/10 rounded-lg transition-all duration-200" onclick="toggleDropdown('movieRoom')">
+                    <div class="flex items-center gap-3">
+                        <i data-feather="film" class="w-4 h-4"></i>
+                        MovieRoom
+                    </div>
+                    <i data-feather="chevron-down" class="w-4 h-4 transition-transform duration-200"></i>
+                </button>
+                <ul id="movieRoom" class="hidden ml-8 space-y-1 text-white/70">
+                    <li><a href="dataMovieRoom.html" class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">ข้อมูลการจอง</a></li>
+                    <li><a href="approveMovieRoom.html" class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">อนุมัติการจอง</a></li>
+                </ul>
+            </li>
+            <!-- BoardGame Dropdown -->
+            <li class="space-y-1">
+                <button class="w-full flex items-center justify-between px-4 py-3 text-white/70 hover:bg-white/10 rounded-lg transition-all duration-200" onclick="toggleDropdown('boardGame')">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-dice"></i>
+                        BoardGame
+                    </div>
+                    <i data-feather="chevron-down" class="w-4 h-4 transition-transform duration-200"></i>
+                </button>
+                <ul id="boardGame" class="hidden ml-8 space-y-1 text-white/70">
+                    <li><a href="dataBoardGame.html" class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">ข้อมูลการจอง</a></li>
+                    <li><a href="approveBoardGame.html" class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">อนุมัติการจอง</a></li>
+                </ul>
+            </li>
+        </ul>
+        <!-- Logout Button -->
+        <div class="mt-auto">
+            <button class="w-auto flex items-center justify-start gap-3 px-2 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg transition-all duration-200">
+                <i data-feather="log-out" class="w-4 h-4"></i>
+                Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="ml-[280px] p-6 w-full">
+        <!-- Booking Table Section -->
+        <h3 class="text-xl font-semibold text-gray-800 mb-4 pl-4">อนุมัติการจองห้องประชุม</h3>
+        <div class="bg-white rounded-lg shadow p-4 overflow-x-auto">
+            <table class="min-w-full text-left text-sm text-gray-600">
+                <thead>
+                    <tr class="bg-gray-100">
+                        <th class="py-3 px-4 font-medium">หมายเลขการจอง</th>
+                        <th class="py-3 px-4 font-medium">ผู้จอง</th>
+                        <th class="py-3 px-4 font-medium">ห้อง</th>
+                        <th class="py-3 px-4 font-medium">วันที่จอง</th>
+                        <th class="py-3 px-4 font-medium">สถานะ</th>
+                        <th class="py-3 px-4 font-medium">การจัดการ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="py-3 px-4">#001</td>
+                        <td class="py-3 px-4">สมชาย ชาญชัย</td>
+                        <td class="py-3 px-4">ห้องประชุม 2</td>
+                        <td class="py-3 px-4">27/10/2024</td>
+                        <td class="py-3 px-4 text-yellow-600">รอดำเนินการ</td>
+                        <td class="py-3 px-4">
+                            <button class="bg-blue-500 text-white px-3 py-1 rounded-lg text-xs hover:bg-blue-600">อนุมัติ</button>
+                            <button class="bg-red-500 text-white px-3 py-1 rounded-lg text-xs hover:bg-red-600">ยกเลิก</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="approveMeetingRoom.js"></script>
+</body>
+</html>

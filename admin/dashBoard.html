@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+    <!-- Sidebar -->
+    <div class="w-[280px] bg-[#1e2124] min-h-screen p-4 fixed left-0 top-0 text-white flex flex-col">
+        <!-- Sidebar Header -->
+        <div class="p-3.5 px-4 flex items-center justify-center gap-2 text-xl font-semibold border-b border-white/10 mb-4">             
+            <img src="/img_home_page/pngegg 2.png" alt="University Logo" class="w-30 h-10 object-contain">         
+        </div>
+        <!-- Navigation Menu -->
+        <ul class="flex flex-col gap-1">
+            <li>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 text-white bg-blue-600 rounded-lg">
+                    <i data-feather="bar-chart-2" class="w-4 h-4"></i>
+                    Dashboard
+                </a>
+            </li>
+            <!-- MeetingRoom Dropdown -->
+            <li class="space-y-1">
+                <button class="w-full flex items-center justify-between px-4 py-3 text-white/70 hover:bg-white/10 rounded-lg transition-all duration-200" onclick="toggleDropdown('meetingRoom')">
+                    <div class="flex items-center gap-3">
+                        <i data-feather="message-square" class="w-4 h-4"></i>
+                        MeetingRoom
+                    </div>
+                    <i data-feather="chevron-down" class="w-4 h-4 transition-transform duration-200"></i>
+                </button>
+                <ul id="meetingRoom" class="hidden ml-8 space-y-1 text-white/70">
+                    <li><a href="dataMeetingRoom.html" class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">ข้อมูลการจอง</a></li>
+                    <li><a href="approveMeetingRoom.html" class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">อนุมัติการจอง</a></li>
+                </ul>
+            </li>
+            <!-- MovieRoom Dropdown -->
+            <li class="space-y-1">
+                <button class="w-full flex items-center justify-between px-4 py-3 text-white/70 hover:bg-white/10 rounded-lg transition-all duration-200" onclick="toggleDropdown('movieRoom')">
+                    <div class="flex items-center gap-3">
+                        <i data-feather="film" class="w-4 h-4"></i>
+                        MovieRoom
+                    </div>
+                    <i data-feather="chevron-down" class="w-4 h-4 transition-transform duration-200"></i>
+                </button>
+                <ul id="movieRoom" class="hidden ml-8 space-y-1 text-white/70">
+                    <li><a href="movieRoom.html" class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">ข้อมูลการจอง</a></li>
+                    <li><a href="#" class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">อนุมัติการจอง</a></li>
+                </ul>
+            </li>
+            <!-- BoardGame Dropdown -->
+            <li class="space-y-1">
+                <button class="w-full flex items-center justify-between px-4 py-3 text-white/70 hover:bg-white/10 rounded-lg transition-all duration-200" onclick="toggleDropdown('boardGame')">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-dice"></i>
+                        BoardGame
+                    </div>
+                    <i data-feather="chevron-down" class="w-4 h-4 transition-transform duration-200"></i>
+                </button>
+                <ul id="boardGame" class="hidden ml-8 space-y-1 text-white/70">
+                    <li><a href="boardGame.html" class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">ข้อมูลการจอง</a></li>
+                    <li><a href="#" class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">อนุมัติการจอง</a></li>
+                </ul>
+            </li>
+        </ul>
+        <!-- Logout Button -->
+        <div class="mt-auto">
+            <button class="w-auto flex items-center justify-start gap-3 px-2 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg transition-all duration-200">
+                <i data-feather="log-out" class="w-4 h-4"></i>
+                Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- DashBoard -->
+    <div class="ml-0 md:ml-[280px] p-6 space-y-6">
+        <!-- ระบบการจอง -->
+        <div class="flex gap-4 mt-6">
+            <button id="openBookingButton" onclick="toggleBookingSystem(true)" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200">เปิดระบบการจอง</button>
+            <button id="closeBookingButton" onclick="toggleBookingSystem(false)" class="hidden px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-200">ปิดระบบการจอง</button>
+        </div>
+
+        <!-- Overview Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Users Card -->
+            <div class="bg-white p-6 rounded-lg shadow-sm">
+                <div class="flex items-center justify-between">
+                    <div class="p-2 bg-blue-100 rounded-full">
+                        <i data-feather="users" class="h-8 w-8 text-blue-500"></i>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm font-medium text-gray-500">ผู้ใช้ทั้งหมด</p>
+                        <h3 class="text-2xl font-bold mt-1" id="totalUsers">485</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Bookings Card -->
+            <div class="bg-white p-6 rounded-lg shadow-sm">
+                <div class="flex items-center justify-between">
+                    <div class="p-2 bg-green-100 rounded-full">
+                        <i data-feather="calendar" class="h-8 w-8 text-green-500"></i>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm font-medium text-gray-500">การจองทั้งหมด</p>
+                        <h3 class="text-2xl font-bold mt-1" id="totalBookings">150</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Bookings Card -->
+            <div class="bg-white p-6 rounded-lg shadow-sm">
+                <div class="flex items-center justify-between">
+                    <div class="p-2 bg-yellow-100 rounded-full">
+                        <i data-feather="clock" class="h-8 w-8 text-yellow-500"></i>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm font-medium text-gray-500">การจองที่กำลังใช้งาน</p>
+                        <h3 class="text-2xl font-bold mt-1" id="activeBookings">12</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Room Types Tabs -->
+        <div class="bg-white rounded-lg shadow-sm">
+            <div class="border-b">
+                <nav class="flex space-x-4 px-6" aria-label="Tabs">
+                    <button onclick="showTab('meeting')" class="px-4 py-3 text-sm font-medium text-blue-600 border-b-2 border-blue-600" id="meeting-tab">
+                        <div class="flex items-center space-x-2">
+                            <i data-feather="users" class="h-4 w-4"></i>
+                            <span>ห้องประชุม</span>
+                        </div>
+                    </button>
+                    <button onclick="showTab('movie')" class="px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700" id="movie-tab">
+                        <div class="flex items-center space-x-2">
+                            <i data-feather="film" class="h-4 w-4"></i>
+                            <span>ห้องภาพยนตร์</span>
+                        </div>
+                    </button>
+                    <button onclick="showTab('boardgame')" class="px-4 py-3 text-sm font-medium text-gray-500 hover:text-gray-700" id="boardgame-tab">
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-dice h-4 w-4"></i>
+                            <span>ห้องบอร์ดเกม</span>
+                        </div>
+                    </button>
+                </nav>
+            </div>
+            <!-- Tab Contents -->
+            <div class="p-6">
+                <!-- Meeting Room Content -->
+                <div id="meeting-content" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded border">
+                        <div class="flex items-center justify-between">
+                            <p class="text-sm font-medium text-gray-500">การจองทั้งหมด</p>
+                            <p class="text-2xl font-bold">45</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded border">
+                        <div class="flex items-center justify-between">
+                            <p class="text-sm font-medium text-gray-500">กำลังใช้งาน</p>
+                            <p class="text-2xl font-bold">5</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded border">
+                        <div class="flex items-center justify-between">
+                            <p class="text-sm font-medium text-gray-500">อัตราการใช้งาน</p>
+                            <div class="flex items-center">
+                                <i data-feather="trending-up" class="h-4 w-4 text-green-500 mr-2"></i>
+                                <p class="text-2xl font-bold">78%</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Movie Room Content (Hidden by default) -->
+                <div id="movie-content" class="hidden grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded border">
+                        <div class="flex items-center justify-between">
+                            <p class="text-sm font-medium text-gray-500">การจองทั้งหมด</p>
+                            <p class="text-2xl font-bold">35</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded border">
+                        <div class="flex items-center justify-between">
+                            <p class="text-sm font-medium text-gray-500">กำลังใช้งาน</p>
+                            <p class="text-2xl font-bold">3</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded border">
+                        <div class="flex items-center justify-between">
+                            <p class="text-sm font-medium text-gray-500">อัตราการใช้งาน</p>
+                            <div class="flex items-center">
+                                <i data-feather="trending-up" class="h-4 w-4 text-green-500 mr-2"></i>
+                                <p class="text-2xl font-bold">65%</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Board Game Room Content (Hidden by default) -->
+                <div id="boardgame-content" class="hidden grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded border">
+                        <div class="flex items-center justify-between">
+                            <p class="text-sm font-medium text-gray-500">การจองทั้งหมด</p>
+                            <p class="text-2xl font-bold">70</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded border">
+                        <div class="flex items-center justify-between">
+                            <p class="text-sm font-medium text-gray-500">กำลังใช้งาน</p>
+                            <p class="text-2xl font-bold">4</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded border">
+                        <div class="flex items-center justify-between">
+                            <p class="text-sm font-medium text-gray-500">อัตราการใช้งาน</p>
+                            <div class="flex items-center">
+                                <i data-feather="trending-up" class="h-4 w-4 text-green-500 mr-2"></i>
+                                <p class="text-2xl font-bold">72%</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+    <script src="dashBoard.js"></script>
+</body>
+</html>

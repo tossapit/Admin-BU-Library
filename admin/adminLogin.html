@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - Admin</title>
+    <title>Login - Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -15,9 +15,9 @@
 </head>
 <body class="bg-gradient-to-br from-blue-50 to-gray-100 min-h-screen flex items-center justify-center p-4">
     <div class="container max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
-        <div class="form-container block" id="registerForm">
-            <h2 class="text-3xl font-bold text-center text-gray-800 mb-8 tracking-tight">ลงทะเบียนผู้ดูแลระบบ</h2>
-            <form id="adminRegister" class="space-y-6">
+        <div class="form-container block">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-8 tracking-tight">เข้าสู่ระบบ</h2>
+            <form id="adminLogin" class="space-y-6">
                 <div class="form-group">
                     <label for="username" class="block text-gray-700 font-medium mb-2">ชื่อผู้ใช้</label>
                     <input type="text" id="username" name="username" required
@@ -30,29 +30,21 @@
                     <input type="password" id="password" name="password" required
                            class="form-input w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition-colors"
                            placeholder="กรุณากรอกรหัสผ่าน">
-                    <p class="text-sm text-gray-500 mt-1.5">* รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร</p>
                 </div>
-                
-                <div class="form-group">
-                    <label for="confirmPassword" class="block text-gray-700 font-medium mb-2">ยืนยันรหัสผ่าน</label>
-                    <input type="password" id="confirmPassword" name="confirmPassword" required
-                           class="form-input w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition-colors"
-                           placeholder="กรุณายืนยันรหัสผ่าน">
-                </div>
-                
-                <button type="submit" disabled
-                        class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
-                    ลงทะเบียน
+
+                <button type="submit"
+                        class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium shadow-sm">
+                    เข้าสู่ระบบ
                 </button>
 
                 <div class="text-center">
-                    <p class="text-gray-600">มีบัญชีอยู่แล้ว? 
-                        <a href="adminLogin.html" class="text-blue-600 hover:text-blue-700 font-medium">เข้าสู่ระบบ</a>
+                    <p class="text-gray-600">ยังไม่มีบัญชี? 
+                        <a href="register.html" class="text-blue-600 hover:text-blue-700 font-medium">ลงทะเบียน</a>
                     </p>
                 </div>
             </form>
         </div>
     </div>
-    <script type="module" src="adminRegis.js"></script>
+    <script type="module" src="adminLogin.js"></script>
 </body>
 </html>

@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
-<body class="bg-gray-100">
+<body class="bg-gray-200">
     <!-- Sidebar -->
     <div class="w-[280px] bg-[#1e2124] min-h-screen p-4 fixed left-0 top-0 text-white flex flex-col">
         <!-- Sidebar Header -->
@@ -66,9 +66,11 @@
                 </ul>
             </li>
         </ul>
+
         <!-- Logout Button -->
         <div class="mt-auto">
-            <button class="w-auto flex items-center justify-start gap-3 px-2 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg transition-all duration-200">
+            <button
+                class="logout-btn w-auto flex items-center justify-start gap-3 px-2 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg transition-all duration-200">
                 <i data-feather="log-out" class="w-4 h-4"></i>
                 Logout
             </button>
@@ -84,7 +86,7 @@
         </div>
 
         <!-- Overview Stats -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6" >
             <!-- Users Card -->
             <div class="bg-white p-6 rounded-lg shadow-sm">
                 <div class="flex items-center justify-between">

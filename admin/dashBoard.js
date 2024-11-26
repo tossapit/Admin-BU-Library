@@ -1,15 +1,26 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize Feather Icons
-    feather.replace();
+// Add this to your existing JavaScript (dashBoard.js)
+function handleLogout() {
+    const confirmed = confirm("คุณต้องการออกจากระบบใช่หรือไม่?");
+    if (confirmed) {
+        // Add your logout logic here - for example:
+        window.location.href = 'adminLogin.html'; // Redirect to login page
+    }
+}
 
-    // Default tab selection
+document.addEventListener('DOMContentLoaded', function() {
+    // Your existing initialization code
+    feather.replace();
     showTab('meeting');
-    
-    // Update stats on page load
     updateStats();
+    
+    // Add logout button event listener
+    const logoutButton = document.querySelector('.logout-btn');
+    if (logoutButton) {
+        logoutButton.addEventListener('click', handleLogout);
+    }
 });
 
-// Tab Switching Logic
+// Rest of your existing JavaScript functions...
 function showTab(tabName) {
     // Hide all content and reset tab styles
     document.querySelectorAll('[id$="-content"]').forEach(content => content.classList.add('hidden'));
@@ -25,7 +36,6 @@ function showTab(tabName) {
     selectedTab.classList.remove('text-gray-500');
 }
 
-// Sample data update function
 function updateStats() {
     const stats = {
         totalUsers: 485,
@@ -38,15 +48,12 @@ function updateStats() {
     document.getElementById('activeBookings').textContent = stats.activeBookings;
 }
 
-// Dropdown functionality
 function toggleDropdown(id) {
     const dropdown = document.getElementById(id);
     const icon = event.currentTarget.querySelector('[data-feather="chevron-down"]');
     
-    // Toggle visibility using Tailwind classes
     dropdown.classList.toggle('hidden');
     
-    // Rotate icon
     if (dropdown.classList.contains('hidden')) {
         icon.style.transform = 'rotate(0deg)';
     } else {
@@ -56,7 +63,6 @@ function toggleDropdown(id) {
     feather.replace();
 }
 
-// Booking system toggle
 function toggleBookingSystem(isOpen) {
     document.getElementById('openBookingButton').classList.toggle("hidden", isOpen);
     document.getElementById('closeBookingButton').classList.toggle("hidden", !isOpen);

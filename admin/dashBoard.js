@@ -38,9 +38,9 @@ function showTab(tabName) {
 
 function updateStats() {
     const stats = {
-        totalUsers: 485,
-        totalBookings: 150,
-        activeBookings: 12
+        totalUsers: null,
+        totalBookings: null,
+        activeBookings: null
     };
 
     document.getElementById('totalUsers').textContent = stats.totalUsers;

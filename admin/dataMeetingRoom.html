@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
-<body class="bg-gray-100 flex">
+<body class="bg-gray-200 flex">
 
     <!-- Sidebar -->
     <div class="w-[280px] bg-[#1e2124] min-h-screen p-4 fixed left-0 top-0 text-white flex flex-col">
@@ -26,13 +26,14 @@
             </li>
             <!-- MeetingRoom Dropdown -->
             <li class="space-y-1">
-                <button class="w-full flex items-center justify-between px-4 py-3 text-white/70 hover:bg-white/10 rounded-lg transition-all duration-200" onclick="toggleDropdown('meetingRoom')">
+                <button class="w-full flex items-center justify-between px-4 py-3 text-white/70 hover:bg-white/10 rounded-lg transition-all duration-200" onclick="toggleDropdown('meetingRoom', event)">
                     <div class="flex items-center gap-3">
                         <i data-feather="message-square" class="w-4 h-4"></i>
                         MeetingRoom
                     </div>
                     <i data-feather="chevron-down" class="w-4 h-4 transition-transform duration-200"></i>
                 </button>
+                
                 <ul id="meetingRoom" class="ml-8 space-y-1 text-white/70">
                     <li><a href="#" class="block py-2 px-4 bg-blue-600 rounded-lg transition-colors duration-200">ข้อมูลการจอง</a></li>
                     <li><a href="approveMeetingRoom.html" class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">อนุมัติการจอง</a></li>
@@ -40,7 +41,7 @@
             </li>
             <!-- MovieRoom Dropdown -->
             <li class="space-y-1">
-                <button class="w-full flex items-center justify-between px-4 py-3 text-white/70 hover:bg-white/10 rounded-lg transition-all duration-200" onclick="toggleDropdown('movieRoom')">
+                <button class="w-full flex items-center justify-between px-4 py-3 text-white/70 hover:bg-white/10 rounded-lg transition-all duration-200" onclick="toggleDropdown('movieRoom', event)">
                     <div class="flex items-center gap-3">
                         <i data-feather="film" class="w-4 h-4"></i>
                         MovieRoom
@@ -54,7 +55,7 @@
             </li>
             <!-- BoardGame Dropdown -->
             <li class="space-y-1">
-                <button class="w-full flex items-center justify-between px-4 py-3 text-white/70 hover:bg-white/10 rounded-lg transition-all duration-200" onclick="toggleDropdown('boardGame')">
+                <button class="w-full flex items-center justify-between px-4 py-3 text-white/70 hover:bg-white/10 rounded-lg transition-all duration-200" onclick="toggleDropdown('boardGame', event)">
                     <div class="flex items-center gap-3">
                         <i class="fa-solid fa-dice"></i>
                         BoardGame
@@ -111,21 +112,11 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td class="py-3 px-4">#001</td>
-                        <td class="py-3 px-4">สมชาย ชาญชัย</td>
-                        <td class="py-3 px-4">ห้องประชุม 2</td>
-                        <td class="py-3 px-4">27/10/2024</td>
-                        <td class="py-3 px-4 text-green-600">อนุมัติแล้ว</td>
-                        <td class="py-3 px-4">
-                            <button class="bg-blue-500 text-white px-3 py-1 rounded-lg text-xs hover:bg-blue-600">เเสดง</button>
-                            <button class="bg-red-500 text-white px-3 py-1 rounded-lg text-xs hover:bg-red-600">ยกเลิก</button>
-                        </td>
-                    </tr>
+                    
                 </tbody>
             </table>
         </div>
     </div>
-    <script src="dataMeetingRoom.js"></script>
+    <script type="module" src="dataMeetingRoom.js"></script>
 </body>
 </html>

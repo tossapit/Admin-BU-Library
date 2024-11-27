@@ -1,16 +1,72 @@
-document.addEventListener('DOMContentLoaded', function() {
-    feather.replace();
-});
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 
-// Dropdown functionality
-function toggleDropdown(id) {
+const firebaseConfig = {
+    apiKey: "AIzaSyCTRAyaI-eBBfWUjMSv1XprKAaIDlacy3g",
+    authDomain: "bulibrary-770bb.firebaseapp.com",
+    projectId: "bulibrary-770bb",
+    storageBucket: "bulibrary-770bb.firebasestorage.app",
+    messagingSenderId: "688134819645",
+    appId: "1:688134819645:web:97a300cfac462f5459bf54",
+    measurementId: "G-C72Z3EK47W",
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+async function fetchApprovedBookings() {
+    const bookingsTable = document.querySelector('table tbody');
+    if (!bookingsTable) return;
+    
+    try {
+        const q = query(
+            collection(db, 'bookings'),
+            where('room_type', '==', 'Meeting Room'),
+            where('status', '==', 'อนุมัติ')
+        );
+        
+        const snapshot = await getDocs(q);
+        bookingsTable.innerHTML = '';
+        
+        snapshot.forEach((doc) => {
+            const booking = doc.data();
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td class="border px-4 py-2">#${doc.id}</td>
+                <td class="border px-4 py-2">${booking.mainBooker}</td>
+                <td class="border px-4 py-2">${booking.room_type}</td>
+                <td class="border px-4 py-2">${new Date(booking.created_at).toLocaleDateString("th-TH")}</td>
+                <td class="border px-4 py-2">${booking.status}</td>
+                <td class="border px-4 py-2">
+                    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded mr-2">
+                        แสดง
+                    </button>
+                </td>
+            `;
+            
+            const showButton = row.querySelector(".bg-blue-500");
+            showButton.addEventListener("click", function() {
+                sessionStorage.setItem('selectedBooking', JSON.stringify({
+                    id: doc.id,
+                    ...booking
+                }));
+                window.location.href = "adminDetail.html";
+            });
+
+            bookingsTable.appendChild(row);
+        });
+    } catch (error) {
+        console.error("Error fetching bookings:", error);
+        alert('เกิดข้อผิดพลาดในการดึงข้อมูล');
+    }
+}
+
+function toggleDropdown(id, event) {
     const dropdown = document.getElementById(id);
     const icon = event.currentTarget.querySelector('[data-feather="chevron-down"]');
     
-    // Toggle visibility using Tailwind classes
     dropdown.classList.toggle('hidden');
     
-    // Rotate icon
     if (dropdown.classList.contains('hidden')) {
         icon.style.transform = 'rotate(0deg)';
     } else {
@@ -19,3 +75,9 @@ function toggleDropdown(id) {
     
     feather.replace();
 }
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    feather.replace();
+    fetchApprovedBookings();
+});

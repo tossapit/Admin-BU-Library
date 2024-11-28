@@ -109,7 +109,32 @@ function toggleDropdown(id) {
     feather.replace();
 }
 
+// Add this to approveMeetingRoom.js
+async function updateNotificationBadge() {
+    try {
+        const q = query(
+            collection(db, 'bookings'),
+            where('room_type', '==', 'Meeting Room'),
+            where('status', '==', 'active')
+        );
+        
+        const snapshot = await getDocs(q);
+        const count = snapshot.size;
+        
+        const badge = document.getElementById('notification-badge');
+        if (count > 0) {
+            badge.textContent = count;
+            badge.classList.remove('hidden');
+        } else {
+            badge.classList.add('hidden');
+        }
+    } catch (error) {
+        console.error("Error fetching notification count:", error);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     feather.replace();
     fetchBookings();
+    updateNotificationBadge();
 });

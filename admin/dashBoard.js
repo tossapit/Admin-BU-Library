@@ -1,56 +1,139 @@
-// Add this to your existing JavaScript (dashBoard.js)
-function handleLogout() {
-    const confirmed = confirm("คุณต้องการออกจากระบบใช่หรือไม่?");
-    if (confirmed) {
-        // Add your logout logic here - for example:
-        window.location.href = 'adminLogin.html'; // Redirect to login page
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+import { getFirestore, collection, getDocs, query, where, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyCTRAyaI-eBBfWUjMSv1XprKAaIDlacy3g",
+    authDomain: "bulibrary-770bb.firebaseapp.com",
+    projectId: "bulibrary-770bb",
+    storageBucket: "bulibrary-770bb.firebasestorage.app",
+    messagingSenderId: "688134819645",
+    appId: "1:688134819645:web:97a300cfac462f5459bf54",
+    measurementId: "G-C72Z3EK47W"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+async function updateStats() {
+    try {
+        const [usersSnapshot, bookingsSnapshot, activeSnapshot] = await Promise.all([
+            getDocs(collection(db, 'users')),
+            getDocs(collection(db, 'bookings')),
+            getDocs(query(collection(db, 'bookings'), where('status', '==', 'active')))
+        ]);
+
+        document.getElementById('totalUsers').textContent = usersSnapshot.size;
+        document.getElementById('totalBookings').textContent = bookingsSnapshot.size;
+        document.getElementById('activeBookings').textContent = activeSnapshot.size;
+    } catch (error) {
+        console.error("Error fetching stats:", error);
     }
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Your existing initialization code
-    feather.replace();
-    showTab('meeting');
-    updateStats();
-    
-    // Add logout button event listener
-    const logoutButton = document.querySelector('.logout-btn');
-    if (logoutButton) {
-        logoutButton.addEventListener('click', handleLogout);
+async function updateRoomStats() {
+    try {
+        const rooms = ['Meeting Room', 'Movie Room', 'Board Game'];
+        const contentIds = ['meeting-content', 'movie-content', 'boardgame-content'];
+        
+        for (let i = 0; i < rooms.length; i++) {
+            const roomType = rooms[i];
+            const contentId = contentIds[i];
+            
+            const [totalSnapshot, activeSnapshot] = await Promise.all([
+                getDocs(query(collection(db, 'bookings'), where('room_type', '==', roomType))),
+                getDocs(query(collection(db, 'bookings'), 
+                    where('room_type', '==', roomType),
+                    where('status', '==', 'active')))
+            ]);
+            
+            const content = document.getElementById(contentId);
+            if (content) {
+                const stats = content.getElementsByClassName('flex items-center justify-between');
+                stats[0].lastElementChild.textContent = totalSnapshot.size;
+                stats[1].lastElementChild.textContent = activeSnapshot.size;
+                
+                const usageRate = totalSnapshot.size ? 
+                    ((activeSnapshot.size / totalSnapshot.size) * 100).toFixed(1) : 0;
+                stats[2].querySelector('.flex.items-center').textContent = `${usageRate}%`;
+            }
+        }
+    } catch (error) {
+        console.error("Error updating room stats:", error);
     }
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    feather.replace();
+    await Promise.all([updateStats(), updateRoomStats()]);
+    showTab('meeting');
+    
+    const logoutButton = document.querySelector('.mt-auto');
+    logoutButton?.addEventListener('click', handleLogout);
 });
 
-// Rest of your existing JavaScript functions...
-function showTab(tabName) {
-    // Hide all content and reset tab styles
-    document.querySelectorAll('[id$="-content"]').forEach(content => content.classList.add('hidden'));
+function handleLogout() {
+    if (confirm("คุณต้องการออกจากระบบใช่หรือไม่?")) {
+        window.location.href = 'adminLogin.html';
+    }
+}
+
+// Make functions globally accessible
+window.showTab = function(tabName) {
+    const contents = document.querySelectorAll('[id$="-content"]');
+    contents.forEach(content => content.classList.add('hidden'));
+    document.getElementById(`${tabName}-content`).classList.remove('hidden');
+    
+    // Update tab styles
     document.querySelectorAll('[id$="-tab"]').forEach(tab => {
         tab.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600');
-        tab.classList.add('text-gray-500');
+        tab.classList.add('text-gray-600');
     });
+    const activeTab = document.getElementById(`${tabName}-tab`);
+    activeTab.classList.remove('text-gray-600');
+    activeTab.classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
+};
 
-    // Show selected content and update tab styles
-    document.getElementById(tabName + '-content').classList.remove('hidden');
-    const selectedTab = document.getElementById(tabName + '-tab');
-    selectedTab.classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
-    selectedTab.classList.remove('text-gray-500');
+window.toggleBookingSystem = async function(isOpen) {
+    try {
+        if (confirm(`คุณต้องการ${isOpen ? 'เปิด' : 'ปิด'}ระบบการจองหรือไม่?`)) {
+            await setDoc(doc(db, 'system', 'bookingStatus'), { isOpen }, { merge: true });
+            alert(isOpen ? 'เปิดระบบการจองสำเร็จ' : 'ปิดระบบการจองสำเร็จ');
+        }
+    } catch (error) {
+        console.error("Error toggling system:", error);
+        alert('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง');
+    }
+ };
+
+async function updateNotificationBadge() {
+    try {
+        const q = query(
+            collection(db, 'bookings'),
+            where('room_type', '==', 'Meeting Room'),
+            where('status', '==', 'active')
+        );
+        
+        const snapshot = await getDocs(q);
+        const count = snapshot.size;
+        
+        const badge = document.getElementById('notification-badge');
+        if (count > 0) {
+            badge.textContent = count;
+            badge.classList.remove('hidden');
+        } else {
+            badge.classList.add('hidden');
+        }
+    } catch (error) {
+        console.error("Error fetching notification count:", error);
+    }
 }
 
-function updateStats() {
-    const stats = {
-        totalUsers: null,
-        totalBookings: null,
-        activeBookings: null
-    };
-
-    document.getElementById('totalUsers').textContent = stats.totalUsers;
-    document.getElementById('totalBookings').textContent = stats.totalBookings;
-    document.getElementById('activeBookings').textContent = stats.activeBookings;
-}
-
-function toggleDropdown(id) {
+// Dropdown functionality
+// Make toggleDropdown globally accessible
+window.toggleDropdown = function(id) {
     const dropdown = document.getElementById(id);
-    const icon = event.currentTarget.querySelector('[data-feather="chevron-down"]');
+    const button = document.querySelector(`button[onclick="toggleDropdown('${id}')"]`);
+    const icon = button.querySelector('[data-feather="chevron-down"]');
     
     dropdown.classList.toggle('hidden');
     
@@ -61,9 +144,24 @@ function toggleDropdown(id) {
     }
     
     feather.replace();
-}
+};
 
-function toggleBookingSystem(isOpen) {
-    document.getElementById('openBookingButton').classList.toggle("hidden", isOpen);
-    document.getElementById('closeBookingButton').classList.toggle("hidden", !isOpen);
-}
+document.addEventListener('DOMContentLoaded', async () => {
+    feather.replace();
+    await Promise.all([
+        updateStats(), 
+        updateRoomStats(),
+        updateNotificationBadge()
+    ]);
+    showTab('meeting');
+    
+    // Add event listeners
+    const logoutButton = document.querySelector('.mt-auto');
+    logoutButton?.addEventListener('click', handleLogout);
+
+    // Add dropdown event listeners to menu items
+    const dropdownButtons = document.querySelectorAll('[data-dropdown]');
+    dropdownButtons.forEach(button => {
+        button.addEventListener('click', () => toggleDropdown(button.dataset.dropdown));
+    });
+});

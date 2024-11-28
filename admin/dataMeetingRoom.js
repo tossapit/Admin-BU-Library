@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+import { getFirestore, collection, getDocs, query, where, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyCTRAyaI-eBBfWUjMSv1XprKAaIDlacy3g",
@@ -41,6 +41,9 @@ async function fetchApprovedBookings() {
                     <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded mr-2">
                         แสดง
                     </button>
+                    <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded" onclick="deleteBooking('${doc.id}')">
+                        ยกเลิก
+                    </button>
                 </td>
             `;
             
@@ -52,14 +55,28 @@ async function fetchApprovedBookings() {
                 }));
                 window.location.href = "adminDetail.html";
             });
-
+ 
             bookingsTable.appendChild(row);
         });
     } catch (error) {
         console.error("Error fetching bookings:", error);
         alert('เกิดข้อผิดพลาดในการดึงข้อมูล');
     }
-}
+ }
+ 
+ // Add delete function
+ window.deleteBooking = async function(bookingId) {
+    if (confirm('คุณต้องการยกเลิกการจองนี้หรือไม่?')) {
+        try {
+            await deleteDoc(doc(db, 'bookings', bookingId));
+            alert('ยกเลิกการจองสำเร็จ');
+            fetchApprovedBookings(); // Refresh the table
+        } catch (error) {
+            console.error("Error deleting booking:", error);
+            alert('เกิดข้อผิดพลาดในการยกเลิกการจอง');
+        }
+    }
+ };
 
 function toggleDropdown(id, event) {
     const dropdown = document.getElementById(id);

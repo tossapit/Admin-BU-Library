@@ -62,7 +62,7 @@
                 </button>
                 <ul id="boardGame" class="ml-8 space-y-1 text-white/70">
                     <li><a href="dataBoardGame.html" class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">ข้อมูลการจอง</a></li>
-                    <li><a href="addBoardGame.html" class="block py-2 px-4 bg-blue-600 rounded-lg transition-colors duration-200">เพิ่มบอร์ดเกม</a></li>
+                    <li><a href="#" class="block py-2 px-4 bg-blue-600 rounded-lg transition-colors duration-200">เพิ่มบอร์ดเกม</a></li>
                 </ul>
             </li>
         </ul>
@@ -76,34 +76,22 @@
     </div>
 
      <!-- Main Content -->
-     <div class="ml-[280px] p-6 w-full">
+    <div class="ml-[280px] p-6 w-full">
         <h2 class="text-2xl font-semibold text-gray-800 mb-6">เพิ่มบอร์ดเกมใหม่</h2>
 
         <!-- Add Boardgame Form -->
         <div class="bg-white rounded-lg shadow-sm p-6 max-w-2xl">
             <form id="addBoardgameForm" class="space-y-6">
                 <div class="space-y-4">
+                    <!-- ชื่อบอร์ดเกม -->
                     <div>
                         <label for="name_bg" class="block text-sm text-gray-700 mb-1">ชื่อบอร์ดเกม</label>
                         <input type="text" id="name_bg" name="name_bg" required
                             class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                     </div>
-
-                    <div>
-                        <label class="block text-sm text-gray-700 mb-1">รูปบอร์ดเกม</label>
-                        <div class="mt-1 flex flex-col items-center">
-                            <img id="preview" src="#" alt="Preview" class="hidden mb-4 max-w-xs max-h-48 object-contain">
-                            <label class="w-full flex flex-col items-center px-4 py-6 bg-white rounded-lg border-2 border-dashed border-gray-300 cursor-pointer hover:bg-gray-50">
-                                <div class="flex flex-col items-center">
-                                    <i data-feather="image" class="w-8 h-8 text-gray-400"></i>
-                                    <p class="mt-2 text-sm text-gray-500">คลิกเพื่อเลือกรูปภาพ</p>
-                                </div>
-                                <input type="file" id="image" accept="image/*" class="hidden" required>
-                            </label>
-                        </div>
-                    </div>
                 </div>
 
+                <!-- Buttons -->
                 <div class="flex justify-end gap-4 mt-6">
                     <button type="button" onclick="window.history.back()" 
                         class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400">
@@ -118,90 +106,6 @@
         </div>
     </div>
 
-    <script type="module">
-        // Import Firebase functions
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, addDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-storage.js";
-
-        // Firebase configuration
-        const firebaseConfig = {
-            // ใส่ config ของ Firebase ของคุณที่นี่
-        };
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const storage = getStorage(app);
-
-        // Function to get next ID
-        async function getNextBoardgameId() {
-            try {
-                const boardgamesRef = collection(db, 'boardgame');
-                const q = query(boardgamesRef, orderBy('bgame_id', 'desc'), limit(1));
-                const querySnapshot = await getDocs(q);
-                
-                if (querySnapshot.empty) {
-                    return '001';
-                }
-
-                const lastId = querySnapshot.docs[0].data().bgame_id;
-                const nextNum = String(Number(lastId) + 1).padStart(3, '0');
-                return nextNum;
-            } catch (error) {
-                console.error("Error getting next ID:", error);
-                return '001'; // เริ่มที่ 001 ถ้ามีข้อผิดพลาด
-            }
-        }
-
-        // Image preview
-        document.getElementById('image').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const preview = document.getElementById('preview');
-                    preview.src = e.target.result;
-                    preview.classList.remove('hidden');
-                }
-                reader.readAsDataURL(file);
-            }
-        });
-
-        // Form submission handler
-        document.getElementById('addBoardgameForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const name_bg = document.getElementById('name_bg').value;
-            const imageFile = document.getElementById('image').files[0];
-
-            try {
-                // Get next ID
-                const bgame_id = await getNextBoardgameId();
-
-                // Upload image to Firebase Storage
-                const storageRef = ref(storage, `boardgame-images/${bgame_id}`);
-                await uploadBytes(storageRef, imageFile);
-                const imageUrl = await getDownloadURL(storageRef);
-
-                // Add document to boardgame collection
-                await addDoc(collection(db, 'boardgame'), {
-                    bgame_id,
-                    name_bg,
-                    image_url: imageUrl
-                });
-
-                alert('เพิ่มบอร์ดเกมสำเร็จ');
-                window.location.href = 'dataBoardGame.html';
-            } catch (error) {
-                console.error("Error adding boardgame:", error);
-                alert('เกิดข้อผิดพลาดในการเพิ่มบอร์ดเกม');
-            }
-        });
-
-        // Initialize Feather icons
-        feather.replace();
-    </script>
     <script type="module" src="addBoardGame.js"></script>
 </body>
 </html>

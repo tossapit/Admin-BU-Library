@@ -16,6 +16,17 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+async function updateBoardGameCount() {
+    try {
+        const boardgameRef = collection(db, 'boardgame');
+        const querySnapshot = await getDocs(boardgameRef);
+        const totalGames = querySnapshot.size;
+        document.querySelector('.bg-white:nth-child(1) p').textContent = `จำนวนบอร์ดเกมทั้งหมด: ${totalGames} เกม`;
+    } catch (error) {
+        console.error("Error counting boardgames:", error);
+    }
+}
+
 // Function to populate booking table
 async function populateBookingTable() {
     try {
@@ -50,17 +61,14 @@ async function populateBookingTable() {
 
 // Function to update statistics
 function updateStatistics(bookings) {
-    // Get today's date in YYYY-MM-DD format
     const today = new Date().toISOString().split('T')[0];
-    
-    // Count today's bookings
     const todayBookings = bookings.filter(doc => 
         doc.data().bbgame_date === today
     ).length;
 
-    // Update UI
-    document.querySelector('.bg-white:nth-child(1) p').textContent = `จำนวนบอร์ดเกมทั้งหมด: 20 เกม`;
-    document.querySelector('.bg-white:nth-child(2) p').textContent = `การจองวันนี้: ${bookings.length} ครั้ง`;
+    updateBoardGameCount(); // เรียกใช้ฟังก์ชันนับบอร์ดเกม
+    document.querySelector('.bg-white:nth-child(2) p').textContent = `การจองทั้งหมด: ${todayBookings} ครั้ง`;
+    document.querySelector('.bg-white:nth-child(3) p').textContent = `การจองที่รอดำเนินการ: ${bookings.length} ครั้ง`;
 }
 
 // Helper function to format date
@@ -79,8 +87,7 @@ function formatTime(timeString) {
 // Initialize the page
 document.addEventListener('DOMContentLoaded', async () => {
     await populateBookingTable();
-    
-    // Initialize Feather icons
+    await updateBoardGameCount();
     feather.replace();
 });
 

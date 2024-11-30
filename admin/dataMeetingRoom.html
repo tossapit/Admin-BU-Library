@@ -26,17 +26,19 @@
             </li>
             <!-- MeetingRoom Dropdown -->
             <li class="space-y-1">
-                <button class="w-full flex items-center justify-between px-4 py-3 text-white/70 hover:bg-white/10 rounded-lg transition-all duration-200" onclick="toggleDropdown('meetingRoom', event)">
+                <button class="w-full flex items-center justify-between px-4 py-3 text-white/70 hover:bg-white/10 rounded-lg transition-all duration-200" onclick="toggleDropdown('meetingRoom')">
                     <div class="flex items-center gap-3">
                         <i data-feather="message-square" class="w-4 h-4"></i>
                         MeetingRoom
                     </div>
                     <i data-feather="chevron-down" class="w-4 h-4 transition-transform duration-200"></i>
                 </button>
-                
                 <ul id="meetingRoom" class="ml-8 space-y-1 text-white/70">
-                    <li><a href="#" class="block py-2 px-4 bg-blue-600 rounded-lg transition-colors duration-200">ข้อมูลการจอง</a></li>
-                    <li><a href="approveMeetingRoom.html" class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">อนุมัติการจอง</a></li>
+                    <li><a href="dataMeetingRoom.html" class="block py-2 px-4 bg-blue-600 rounded-lg transition-colors duration-200">ข้อมูลการจอง</a></li>
+                    <li><a href="approveMeetingRoom.html" class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200 relative">
+                        อนุมัติการจอง
+                        <div id="notification-badge" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</div>
+                    </a></li>
                 </ul>
             </li>
             <!-- MovieRoom Dropdown -->

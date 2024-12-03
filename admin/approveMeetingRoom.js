@@ -22,7 +22,7 @@ async function fetchBookings() {
         const q = query(
             collection(db, 'bookings'),
             where('room_type', '==', 'Meeting Room'),
-            where('status', '==', 'active')
+            where('status', '==', 'รออนุมัติ')
         );
         
         const snapshot = await getDocs(q);

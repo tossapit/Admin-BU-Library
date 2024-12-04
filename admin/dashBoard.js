@@ -105,12 +105,12 @@ window.toggleBookingSystem = async function(isOpen) {
     }
  };
 
-async function updateNotificationBadge() {
+ async function updateNotificationBadge() {
     try {
         const q = query(
             collection(db, 'bookings'),
             where('room_type', '==', 'Meeting Room'),
-            where('status', '==', 'active')
+            where('status', '==', 'รออนุมัติ')
         );
         
         const snapshot = await getDocs(q);

@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - MeetingRoom</title>
+    <title>Admin - HistoryMeeting</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
-<body class="bg-gray-200 flex">
+<body class="bg-gray-100 flex">
 
     <!-- Sidebar -->
     <div class="w-[280px] bg-[#1e2124] min-h-screen p-4 fixed left-0 top-0 text-white flex flex-col">
@@ -34,8 +34,8 @@
                     <i data-feather="chevron-down" class="w-4 h-4 transition-transform duration-200"></i>
                 </button>
                 <ul id="meetingRoom" class="ml-8 space-y-1 text-white/70">
-                    <li><a href="dataMeetingRoom.html" class="block py-2 px-4 bg-blue-600 rounded-lg transition-colors duration-200">ข้อมูลการจอง</a></li>
-                    <li><a href="approveMeetingRoom.html" class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200 relative">
+                    <li><a href="dataMeetingRoom.html" class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">ข้อมูลการจอง</a></li>
+                    <li><a href="approveMeetingRoom.html" class="block py-2 px-4 rounded-lg transition-colors duration-200 relative">
                         อนุมัติการจอง
                         <div id="notification-badge" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</div>
                     </a></li>
@@ -43,13 +43,13 @@
                         class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">จัดการห้อง</a>
                     </li>
                     <li><a href="historyMeeting.html"
-                        class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">ประวัติการจอง</a>
+                        class="block py-2 px-4 bg-blue-600 rounded-lg transition-colors duration-200">ประวัติการจอง</a>
                     </li>
                 </ul>
             </li>
             <!-- MovieRoom Dropdown -->
             <li class="space-y-1">
-                <button class="w-full flex items-center justify-between px-4 py-3 text-white/70 hover:bg-white/10 rounded-lg transition-all duration-200" onclick="toggleDropdown('movieRoom', event)">
+                <button class="w-full flex items-center justify-between px-4 py-3 text-white/70 hover:bg-white/10 rounded-lg transition-all duration-200" onclick="toggleDropdown('movieRoom')">
                     <div class="flex items-center gap-3">
                         <i data-feather="film" class="w-4 h-4"></i>
                         MovieRoom
@@ -63,7 +63,7 @@
             </li>
             <!-- BoardGame Dropdown -->
             <li class="space-y-1">
-                <button class="w-full flex items-center justify-between px-4 py-3 text-white/70 hover:bg-white/10 rounded-lg transition-all duration-200" onclick="toggleDropdown('boardGame', event)">
+                <button class="w-full flex items-center justify-between px-4 py-3 text-white/70 hover:bg-white/10 rounded-lg transition-all duration-200" onclick="toggleDropdown('boardGame')">
                     <div class="flex items-center gap-3">
                         <i class="fa-solid fa-dice"></i>
                         BoardGame
@@ -87,44 +87,29 @@
 
     <!-- Main Content -->
     <div class="ml-[280px] p-6 w-full">
-        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Admin - Meeting Room Management</h2>
-
-        <!-- Room Overview Section -->
-        <div class="grid grid-cols-3 gap-4 mb-6">
-            <div class="bg-white p-4 rounded-lg shadow">
-                <h3 class="text-xl font-semibold text-gray-700">ห้องประชุมว่าง</h3>
-                <p class="text-gray-500">จำนวนห้องว่าง: 5 ห้อง</p>
-            </div>
-            <div class="bg-white p-4 rounded-lg shadow">
-                <h3 class="text-xl font-semibold text-gray-700">การจองวันนี้</h3>
-                <p class="text-gray-500">การจองทั้งหมด: 15 ครั้ง</p>
-            </div>
-            <div class="bg-white p-4 rounded-lg shadow">
-                <h3 class="text-xl font-semibold text-gray-700">การจองที่รอดำเนินการ</h3>
-                <p class="text-gray-500">การจองที่ยังไม่อนุมัติ: 0 ครั้ง</p>
-            </div>
-        </div>
-
         <!-- Booking Table Section -->
-        <h3 class="text-xl font-semibold text-gray-800 mb-4">รายการข้อมูลการจอง</h3>
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-semibold text-gray-800">ประวัติการจอง</h3>
+            <button onclick="clearTable()" class="bg-red-500 hover:bg-red-700 text-white font-medium py-2 px-4 rounded transition-colors duration-200">
+                ล้างตาราง
+            </button>
+        </div>
         <div class="bg-white rounded-lg shadow p-4 overflow-x-auto">
-            <table class="min-w-full text-left text-sm text-gray-600">
-                <thead>
-                    <tr class="bg-gray-100">
-                        <th class="py-3 px-4 font-medium">หมายเลขการจอง</th>
-                        <th class="py-3 px-4 font-medium">ผู้จอง</th>
-                        <th class="py-3 px-4 font-medium">ห้อง</th>
-                        <th class="py-3 px-4 font-medium">วันที่จอง</th>
-                        <th class="py-3 px-4 font-medium">สถานะ</th>
-                        <th class="py-3 px-4 font-medium">การจัดการ</th>
+            <table class="w-full border-collapse bg-white">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-600">หมายเลขการจอง</th>
+                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-600">ผู้จอง</th>
+                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-600">ห้อง</th>
+                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-600">วันที่จอง</th>
+                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-600">สถานะ</th>
                     </tr>
                 </thead>
-                <tbody>
-                    
+                <tbody class="divide-y divide-gray-200">
                 </tbody>
             </table>
         </div>
     </div>
-    <script type="module" src="dataMeetingRoom.js"></script>
+    <script type="module" src="historyMeeting.js"></script>
 </body>
 </html>

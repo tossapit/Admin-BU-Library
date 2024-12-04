@@ -39,11 +39,15 @@
                     <li><a href="dataMeetingRoom.html"
                             class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">ข้อมูลการจอง</a>
                     </li>
-                    <li><a href="approveMeetingRoom.html"
-                            class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">อนุมัติการจอง</a>
-                    </li>
+                    <li><a href="approveMeetingRoom.html" class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200 relative">
+                        อนุมัติการจอง
+                        <div id="notification-badge" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</div>
+                    </a></li>
                     <li><a href="meetingRoommgr.html"
                             class="block py-2 px-4 bg-blue-600 rounded-lg transition-colors duration-200">จัดการห้อง</a>
+                    </li>
+                    <li><a href="historyMeeting.html"
+                        class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">ประวัติการจอง</a>
                     </li>
                 </ul>
             </li>
@@ -100,24 +104,22 @@
         <div class="max-w-4xl">
             <h1 class="text-2xl font-bold mb-4">จัดการห้อง</h1>
 
-            <form id="roomForm" class="mb-6">
+            <form id="roomForm" class="mb-6 w-full">
                 <div class="flex gap-2 w-[500px]">
-                    <input type="text" id="roomName" placeholder="ใส่ชื่อห้อง" class="flex-1 p-2 border rounded"
-                        required>
-                    <input type="text" id="floorNumber" placeholder="ชั้น" class="w-24 p-2 border rounded" required>
-                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-                        เพิ่ม
-                    </button>
+                    <input type="text" id="roomName" placeholder="ใส่ชื่อห้อง" class="flex-1 p-2 border rounded" required>
+                    <input type="number" id="floorNumber" placeholder="ชั้น" class="w-24 p-2 border rounded" required>
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">เพิ่ม</button>
                 </div>
             </form>
 
-            <div class="bg-white rounded shadow w-[500px]">
+            <div class="bg-white rounded shadow w-full max-w-[1000px]">
                 <table class="w-full">
                     <thead>
                         <tr class="bg-gray-50">
-                            <th class="px-6 py-3 text-left w-[200px]">ชื่อห้อง</th>
-                            <th class="px-6 py-3 text-left w-[100px]">ชั้น</th>
-                            <th class="px-6 py-3 text-left w-[200px]">จัดการ</th>
+                            <th class="px-6 py-3 text-left">ชื่อห้อง</th>
+                            <th class="px-6 py-3 text-left">ชั้น</th>
+                            <th class="px-6 py-3 text-left">วันที่เพิ่ม</th>
+                            <th class="px-6 py-3 text-left">จัดการ</th>
                         </tr>
                     </thead>
                     <tbody id="roomTable"></tbody>
@@ -126,7 +128,7 @@
         </div>
     </div>
 
-    <script src="meetingRoommgr.html"></script>
+    <script type="module" src="meetingRoommgr.js"></script>
 </body>
 
 </html>

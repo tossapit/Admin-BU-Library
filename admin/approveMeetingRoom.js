@@ -94,7 +94,7 @@ async function rejectBooking(bookingId) {
     }
 }
 
-function toggleDropdown(id) {
+window.toggleDropdown = function(id) {
     const dropdown = document.getElementById(id);
     const icon = event.currentTarget.querySelector('[data-feather="chevron-down"]');
     
@@ -107,7 +107,7 @@ function toggleDropdown(id) {
     }
     
     feather.replace();
-}
+};
 
 // Add this to approveMeetingRoom.js
 async function updateNotificationBadge() {

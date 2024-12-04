@@ -78,7 +78,7 @@ async function fetchApprovedBookings() {
     }
  };
 
-function toggleDropdown(id, event) {
+ window.toggleDropdown = function(id) {
     const dropdown = document.getElementById(id);
     const icon = event.currentTarget.querySelector('[data-feather="chevron-down"]');
     
@@ -91,7 +91,7 @@ function toggleDropdown(id, event) {
     }
     
     feather.replace();
-}
+};
 
 // Add this to approveMeetingRoom.js
 async function updateNotificationBadge() {
@@ -99,7 +99,7 @@ async function updateNotificationBadge() {
         const q = query(
             collection(db, 'bookings'),
             where('room_type', '==', 'Meeting Room'),
-            where('status', '==', 'active')
+            where('status', '==', 'รออนุมัติ')
         );
         
         const snapshot = await getDocs(q);

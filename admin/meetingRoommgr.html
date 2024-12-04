@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>จัดการห้อง</title>
+</head>
+
+<body class="bg-gray-100">
+    <!-- Sidebar -->
+    <div class="w-[280px] bg-[#1e2124] min-h-screen p-4 fixed left-0 top-0 text-white flex flex-col">
+        <div
+            class="p-3.5 px-4 flex items-center justify-center gap-2 text-xl font-semibold border-b border-white/10 mb-4">
+            <img src="/img_home_page/pngegg 2.png" alt="University Logo" class="w-30 h-10 object-contain">
+        </div>
+        <ul class="flex flex-col gap-1">
+            <li>
+                <a href="dashBoard.html"
+                    class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 rounded-lg transition-colors duration-200">
+                    <i data-feather="bar-chart-2" class="w-4 h-4"></i>
+                    Dashboard
+                </a>
+            </li>
+            <li class="space-y-1">
+                <button
+                    class="w-full flex items-center justify-between px-4 py-3 text-white/70 hover:bg-white/10 rounded-lg transition-all duration-200"
+                    onclick="toggleDropdown('meetingRoom')">
+                    <div class="flex items-center gap-3">
+                        <i data-feather="message-square" class="w-4 h-4"></i>
+                        MeetingRoom
+                    </div>
+                    <i data-feather="chevron-down" class="w-4 h-4 transition-transform duration-200"></i>
+                </button>
+                <ul id="meetingRoom" class="ml-8 space-y-1 text-white/70">
+                    <li><a href="dataMeetingRoom.html"
+                            class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">ข้อมูลการจอง</a>
+                    </li>
+                    <li><a href="approveMeetingRoom.html"
+                            class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">อนุมัติการจอง</a>
+                    </li>
+                    <li><a href="meetingRoommgr.html"
+                            class="block py-2 px-4 bg-blue-600 rounded-lg transition-colors duration-200">จัดการห้อง</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="space-y-1">
+                <button
+                    class="w-full flex items-center justify-between px-4 py-3 text-white/70 hover:bg-white/10 rounded-lg transition-all duration-200"
+                    onclick="toggleDropdown('movieRoom')">
+                    <div class="flex items-center gap-3">
+                        <i data-feather="film" class="w-4 h-4"></i>
+                        MovieRoom
+                    </div>
+                    <i data-feather="chevron-down" class="w-4 h-4 transition-transform duration-200"></i>
+                </button>
+                <ul id="movieRoom" class="hidden ml-8 space-y-1 text-white/70">
+                    <li><a href="dataMovieRoom.html"
+                            class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">ข้อมูลการจอง</a>
+                    </li>
+                    <li><a href="approveMovieRoom.html"
+                            class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">อนุมัติการจอง</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="space-y-1">
+                <button
+                    class="w-full flex items-center justify-between px-4 py-3 text-white/70 hover:bg-white/10 rounded-lg transition-all duration-200"
+                    onclick="toggleDropdown('boardGame')">
+                    <div class="flex items-center gap-3">
+                        <i class="fa-solid fa-dice"></i>
+                        BoardGame
+                    </div>
+                    <i data-feather="chevron-down" class="w-4 h-4 transition-transform duration-200"></i>
+                </button>
+                <ul id="boardGame" class="hidden ml-8 space-y-1 text-white/70">
+                    <li><a href="dataBoardGame.html"
+                            class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">ข้อมูลการจอง</a>
+                    </li>
+                    <li><a href="addBoardGame.html"
+                            class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">เพิ่มบอร์ดเกม</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+        <div class="mt-auto">
+            <button
+                class="w-auto flex items-center justify-start gap-3 px-2 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg transition-all duration-200">
+                <i data-feather="log-out" class="w-4 h-4"></i>
+                Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content section only, rest remains the same -->
+    <div class="ml-[280px] p-4">
+        <div class="max-w-4xl">
+            <h1 class="text-2xl font-bold mb-4">จัดการห้อง</h1>
+
+            <form id="roomForm" class="mb-6">
+                <div class="flex gap-2 w-[500px]">
+                    <input type="text" id="roomName" placeholder="ใส่ชื่อห้อง" class="flex-1 p-2 border rounded"
+                        required>
+                    <input type="text" id="floorNumber" placeholder="ชั้น" class="w-24 p-2 border rounded" required>
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                        เพิ่ม
+                    </button>
+                </div>
+            </form>
+
+            <div class="bg-white rounded shadow w-[500px]">
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-gray-50">
+                            <th class="px-6 py-3 text-left w-[200px]">ชื่อห้อง</th>
+                            <th class="px-6 py-3 text-left w-[100px]">ชั้น</th>
+                            <th class="px-6 py-3 text-left w-[200px]">จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="roomTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="meetingRoommgr.html"></script>
+</body>
+
+</html>

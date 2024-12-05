@@ -17,17 +17,17 @@ const db = getFirestore(app);
 async function fetchApprovedBookings() {
     const bookingsTable = document.querySelector('table tbody');
     if (!bookingsTable) return;
-    
+
     try {
         const q = query(
-            collection(db, 'bookings'),
+            collection(db, 'bookingmeeting'),
             where('room_type', '==', 'Meeting Room'),
             where('status', '==', 'อนุมัติ')
         );
-        
+
         const snapshot = await getDocs(q);
         bookingsTable.innerHTML = '';
-        
+
         snapshot.forEach((doc) => {
             const booking = doc.data();
             const row = document.createElement("tr");
@@ -46,7 +46,7 @@ async function fetchApprovedBookings() {
                     </button>
                 </td>
             `;
-            
+
             const showButton = row.querySelector(".bg-blue-500");
             showButton.addEventListener("click", function() {
                 sessionStorage.setItem('selectedBooking', JSON.stringify({
@@ -55,56 +55,54 @@ async function fetchApprovedBookings() {
                 }));
                 window.location.href = "adminDetail.html";
             });
- 
+
             bookingsTable.appendChild(row);
         });
     } catch (error) {
         console.error("Error fetching bookings:", error);
         alert('เกิดข้อผิดพลาดในการดึงข้อมูล');
     }
- }
- 
- // Add delete function
- window.deleteBooking = async function(bookingId) {
+}
+
+window.deleteBooking = async function (bookingId) {
     if (confirm('คุณต้องการยกเลิกการจองนี้หรือไม่?')) {
         try {
-            await deleteDoc(doc(db, 'bookings', bookingId));
+            await deleteDoc(doc(db, 'bookingmeeting', bookingId));
             alert('ยกเลิกการจองสำเร็จ');
-            fetchApprovedBookings(); // Refresh the table
+            fetchApprovedBookings();
         } catch (error) {
             console.error("Error deleting booking:", error);
             alert('เกิดข้อผิดพลาดในการยกเลิกการจอง');
         }
     }
- };
+};
 
 function toggleDropdown(id, event) {
     const dropdown = document.getElementById(id);
     const icon = event.currentTarget.querySelector('[data-feather="chevron-down"]');
-    
+
     dropdown.classList.toggle('hidden');
-    
+
     if (dropdown.classList.contains('hidden')) {
         icon.style.transform = 'rotate(0deg)';
     } else {
         icon.style.transform = 'rotate(180deg)';
     }
-    
+
     feather.replace();
 }
 
-// Add this to approveMeetingRoom.js
 async function updateNotificationBadge() {
     try {
         const q = query(
             collection(db, 'bookings'),
             where('room_type', '==', 'Meeting Room'),
-            where('status', '==', 'active')
+            where('status', '==', 'รออนุมัติ')
         );
-        
+
         const snapshot = await getDocs(q);
         const count = snapshot.size;
-        
+
         const badge = document.getElementById('notification-badge');
         if (count > 0) {
             badge.textContent = count;

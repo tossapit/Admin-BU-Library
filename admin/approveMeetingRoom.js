@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-import { getFirestore, collection, getDocs, deleteDoc, doc, query, where, updateDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+import { getFirestore, collection, getDocs, deleteDoc, doc, query, where, updateDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyCTRAyaI-eBBfWUjMSv1XprKAaIDlacy3g",
@@ -71,9 +71,35 @@ window.confirmAction = (bookingId, action) => {
 async function approveBooking(bookingId) {
     try {
         const bookingRef = doc(db, 'bookings', bookingId);
+        const bookingSnap = await getDoc(bookingRef);
+        if (!bookingSnap.exists()) {
+            throw new Error('Booking not found');
+        }
+
+        const bookingData = bookingSnap.data();
+
         await updateDoc(bookingRef, { 
             status: 'อนุมัติ' 
         });
+        
+        // Add to bookingmeeting collection
+        const bookingMeetingRef = doc(db, 'bookingmeeting', bookingId);
+        await setDoc(bookingMeetingRef, {
+            ...bookingData,
+            status: 'อนุมัติ',
+            approved_at: new Date().toISOString()
+        });
+
+        // Add to historymeeting collection
+        const historyMeetingRef = doc(db, 'historymeeting', bookingId);
+        await setDoc(historyMeetingRef, {
+            ...bookingData,
+            status: 'อนุมัติ',
+            approved_at: new Date().toISOString(),
+            action: 'อนุมัติการจอง',
+            action_at: new Date().toISOString()
+        });
+        
         fetchBookings();
         alert('อนุมัติการจองสำเร็จ');
     } catch (error) {
@@ -84,7 +110,25 @@ async function approveBooking(bookingId) {
 
 async function rejectBooking(bookingId) {
     try {
+        // Get booking data before deleting
         const bookingRef = doc(db, 'bookings', bookingId);
+        const bookingSnap = await getDoc(bookingRef);
+        
+        if (bookingSnap.exists()) {
+            const bookingData = bookingSnap.data();
+            
+            // Add to historymeeting collection
+            const historyMeetingRef = doc(db, 'historymeeting', bookingId);
+            await setDoc(historyMeetingRef, {
+                ...bookingData,
+                status: 'ยกเลิก',
+                rejected_at: new Date().toISOString(),
+                action: 'ยกเลิกการจอง',
+                action_at: new Date().toISOString()
+            });
+        }
+
+        // Delete from bookings
         await deleteDoc(bookingRef);
         fetchBookings();
         alert('ยกเลิกการจองสำเร็จ');
@@ -109,7 +153,6 @@ function toggleDropdown(id) {
     feather.replace();
 }
 
-// Add this to approveMeetingRoom.js
 async function updateNotificationBadge() {
     try {
         const q = query(

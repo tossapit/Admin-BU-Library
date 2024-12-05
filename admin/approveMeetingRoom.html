@@ -88,7 +88,12 @@
     <!-- Main Content -->
     <div class="ml-[280px] p-6 w-full">
         <!-- Booking Table Section -->
-        <h3 class="text-xl font-semibold text-gray-800 mb-4 pl-4">อนุมัติการจองห้องประชุม</h3>
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-semibold text-gray-800">อนุมัติการจองห้องประชุม</h3>
+            <button onclick="clearTable()" class="bg-red-500 hover:bg-red-700 text-white font-medium py-2 px-4 rounded transition-colors duration-200">
+                ล้างตาราง
+            </button>
+        </div>
         <div class="bg-white rounded-lg shadow p-4 overflow-x-auto">
             <table class="min-w-full text-left text-sm text-gray-600">
                 <thead>

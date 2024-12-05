@@ -154,6 +154,28 @@ function toggleDropdown(id) {
     feather.replace();
 }
 
+window.clearTable = async function() {
+    if (confirm('คุณต้องการล้างตารางหรือไม่? ข้อมูลจะถูกลบถาวร')) {
+        try {
+            const q = query(collection(db, 'bookings'), where('room_type', '==', 'Meeting Room'));
+            const snapshot = await getDocs(q);
+            
+            const deletePromises = snapshot.docs.map(doc => deleteDoc(doc.ref));
+            await Promise.all(deletePromises);
+            
+            const tbody = document.querySelector('table tbody');
+            if (tbody) {
+                tbody.innerHTML = '';
+            }
+            
+            alert('ลบข้อมูลสำเร็จ');
+        } catch (error) {
+            console.error("Error clearing data:", error);
+            alert('เกิดข้อผิดพลาดในการลบข้อมูล');
+        }
+    }
+};
+
 async function updateNotificationBadge() {
     try {
         const q = query(

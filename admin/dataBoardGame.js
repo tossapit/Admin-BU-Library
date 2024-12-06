@@ -38,16 +38,28 @@ async function updateBoardGameCount() {
 async function populateBookingTable() {
     try {
         const bookingsRef = collection(db, 'bookingboardgame');
-        const q = query(bookingsRef, orderBy('bbgame_date', 'desc'));
+        // แก้ไขการ query ให้เรียงตาม bbgame_id
+        const q = query(bookingsRef, 
+            orderBy('bbgame_id', 'desc') // เรียงตามหมายเลขการจอง จากมากไปน้อย
+        );
         const querySnapshot = await getDocs(q);
 
         const tbody = document.querySelector('tbody');
         tbody.innerHTML = '';
 
-        for (const doc of querySnapshot.docs) {
-            const booking = doc.data();
-            const boardGameName = await getBoardGameName(booking.boardgame_id || '');
-            
+        // แปลงข้อมูลเป็น array และเรียงลำดับ
+        const bookings = querySnapshot.docs.map(doc => ({
+            ...doc.data(),
+            id: doc.id
+        })).sort((a, b) => {
+            // แปลงเป็นตัวเลขเพื่อเรียงลำดับ
+            const idA = parseInt(a.bbgame_id) || 0;
+            const idB = parseInt(b.bbgame_id) || 0;
+            return idB - idA; // เรียงจากมากไปน้อย
+        });
+
+        // สร้างแถวข้อมูล
+        for (const booking of bookings) {
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td class="py-3 px-4">#${booking.bbgame_id}</td>

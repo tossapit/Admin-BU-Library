@@ -48,8 +48,8 @@
                 </button>
                 <ul id="movieRoom" class="ml-8 space-y-1 text-white/70">
                     <li><a href="dataMovieRoom.html" class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">ข้อมูลการจอง</a></li>
-                    <li><a href="approveMovieRoom.html" class="block py-2 px-4 bg-blue-600 rounded-lg transition-colors duration-200">อนุมัติการจอง</a></li>
-                    <li><a href="movieRoommgr.html" class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">จัดการห้อง</a></li>
+                    <li><a href="approveMovieRoom.html" class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">อนุมัติการจอง</a></li>
+                    <li><a href="movieRoommgr.html" class="block py-2 px-4 bg-blue-600 rounded-lg transition-colors duration-200">จัดการห้อง</a></li>
                     <li><a href="historyMovie.html" class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">ประวัติการจอง</a></li>
                 </ul>
             </li>
@@ -78,32 +78,33 @@
     </div>
     
     <!-- Main Content -->
-    <div class="ml-[280px] p-6 w-full">
-        <div class="flex justify-between items-center mb-4">
-            <h3 class="text-xl font-semibold text-gray-800">อนุมัติการจองห้องดูหนัง</h3>
-            <button onclick="clearTable()" class="bg-red-500 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors duration-200">
-                ล้างตาราง
-            </button>
-        </div>
+    <div class="ml-[280px] p-4">
+        <div class="max-w-4xl">
+            <h1 class="text-2xl font-bold mb-4">จัดการห้อง</h1>
 
-        <div class="bg-white rounded-lg shadow p-4 overflow-x-auto">
-            <table class="min-w-full text-left text-sm text-gray-600">
-                <thead>
-                    <tr class="bg-gray-100">
-                        <th class="py-3 px-4 font-medium">หมายเลขการจอง</th>
-                        <th class="py-3 px-4 font-medium">ผู้จอง</th>
-                        <th class="py-3 px-4 font-medium">ห้อง</th>
-                        <th class="py-3 px-4 font-medium">วันที่จอง</th>
-                        <th class="py-3 px-4 font-medium">สถานะ</th>
-                        <th class="py-3 px-4 font-medium">การจัดการ</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Booking rows will be added here dynamically -->
-                </tbody>
-            </table>
+            <form id="roomForm" class="mb-6 w-full">
+                <div class="flex gap-2 w-[500px]">
+                    <input type="text" id="roomName" placeholder="ใส่ชื่อห้อง" class="flex-1 p-2 border rounded" required>
+                    <input type="number" id="floorNumber" placeholder="ชั้น" class="w-24 p-2 border rounded" required>
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">เพิ่ม</button>
+                </div>
+            </form>
+
+            <div class="bg-white rounded shadow w-full max-w-[1000px]">
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-gray-50">
+                            <th class="px-6 py-3 text-left">ชื่อห้อง</th>
+                            <th class="px-6 py-3 text-left">ชั้น</th>
+                            <th class="px-6 py-3 text-left">วันที่เพิ่ม</th>
+                            <th class="px-6 py-3 text-left">จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="roomTable"></tbody>
+                </table>
+            </div>
         </div>
     </div>
-    <script src="approveMovieRoom.js"></script>
+    <script src="movieRoommgr.js"></script>
 </body>
 </html>

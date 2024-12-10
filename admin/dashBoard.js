@@ -130,38 +130,68 @@ window.toggleBookingSystem = async function(isOpen) {
 
 // Dropdown functionality
 // Make toggleDropdown globally accessible
-window.toggleDropdown = function(id) {
-    const dropdown = document.getElementById(id);
-    const button = document.querySelector(`button[onclick="toggleDropdown('${id}')"]`);
+window.toggleDropdown = function(dropdownId, event) {
+    // ตรวจสอบ parameters
+    event = event || window.event;
+    if (!event) return;
+    
+    // หา dropdown element
+    const dropdown = document.getElementById(dropdownId);
+    if (!dropdown) return;
+
+    // หา icon จากปุ่มที่ถูกคลิก
+    const button = event.currentTarget;
     const icon = button.querySelector('[data-feather="chevron-down"]');
     
+    // Toggle dropdown
     dropdown.classList.toggle('hidden');
     
-    if (dropdown.classList.contains('hidden')) {
-        icon.style.transform = 'rotate(0deg)';
-    } else {
-        icon.style.transform = 'rotate(180deg)';
+    // หมุน icon ถ้ามี
+    if (icon) {
+        icon.style.transform = dropdown.classList.contains('hidden') ? 
+            'rotate(0deg)' : 'rotate(180deg)';
     }
-    
+
+    // Re-render Feather icons
     feather.replace();
 };
 
+// Setup dropdowns
+function setupDropdowns() {
+    // ตั้งค่า event listeners สำหรับทุกปุ่ม dropdown
+    document.querySelectorAll('button[onclick*="toggleDropdown"]').forEach(button => {
+        const dropdownId = button.getAttribute('onclick').match(/'([^']+)'/)?.[1];
+        if (dropdownId) {
+            button.onclick = (event) => toggleDropdown(dropdownId, event);
+        }
+    });
+
+    // Setup initial state for dropdowns
+    const dropdowns = {
+        'meetingRoom': document.getElementById('meetingRoom'),
+        'movieRoom': document.getElementById('movieRoom'),
+        'boardGame': document.getElementById('boardGame')
+    };
+
+    Object.entries(dropdowns).forEach(([id, element]) => {
+        if (element) {
+            element.classList.add('hidden');
+        }
+    });
+}
+
+// ปรับปรุง DOMContentLoaded event listener
 document.addEventListener('DOMContentLoaded', async () => {
     feather.replace();
+    setupDropdowns();
     await Promise.all([
-        updateStats(), 
+        updateStats(),
         updateRoomStats(),
         updateNotificationBadge()
     ]);
     showTab('meeting');
     
-    // Add event listeners
+    // Add logout listener
     const logoutButton = document.querySelector('.mt-auto');
     logoutButton?.addEventListener('click', handleLogout);
-
-    // Add dropdown event listeners to menu items
-    const dropdownButtons = document.querySelectorAll('[data-dropdown]');
-    dropdownButtons.forEach(button => {
-        button.addEventListener('click', () => toggleDropdown(button.dataset.dropdown));
-    });
 });

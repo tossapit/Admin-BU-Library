@@ -1,7 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
 import { getFirestore, collection, getDocs, deleteDoc, doc, query, where, updateDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 
-
 const firebaseConfig = {
     apiKey: "AIzaSyCTRAyaI-eBBfWUjMSv1XprKAaIDlacy3g",
     authDomain: "bulibrary-770bb.firebaseapp.com",
@@ -33,12 +32,12 @@ async function fetchBookings() {
             const booking = doc.data();
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td class="border px-4 py-2">#${doc.id}</td>
-                <td class="border px-4 py-2">${booking.mainBooker}</td>
-                <td class="border px-4 py-2">${booking.room_type}</td>
-                <td class="border px-4 py-2">${new Date(booking.created_at).toLocaleDateString('th-TH')}</td>
-                <td class="border px-4 py-2">${booking.status}</td>
-                <td class="border px-4 py-2">
+                <td class="py-3 px-4">#${doc.id}</td>
+                <td class="py-3 px-4">${booking.mainBooker}</td>
+                <td class="py-3 px-4">${booking.room_type}</td>
+                <td class="py-3 px-4">${new Date(booking.created_at).toLocaleDateString('th-TH')}</td>
+                <td class="py-3 px-4">${booking.status}</td>
+                <td class="py-3 px-4">
                     <button onclick="confirmAction('${doc.id}', 'approve')" 
                             class="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-3 rounded mr-2">
                         อนุมัติ
@@ -111,14 +110,12 @@ async function approveBooking(bookingId) {
 
 async function rejectBooking(bookingId) {
     try {
-        // Get booking data before deleting
         const bookingRef = doc(db, 'bookings', bookingId);
         const bookingSnap = await getDoc(bookingRef);
         
         if (bookingSnap.exists()) {
             const bookingData = bookingSnap.data();
             
-            // Add to historymeeting collection
             const historyMeetingRef = doc(db, 'historymeeting', bookingId);
             await setDoc(historyMeetingRef, {
                 ...bookingData,
@@ -129,7 +126,6 @@ async function rejectBooking(bookingId) {
             });
         }
 
-        // Delete from bookings
         await deleteDoc(bookingRef);
         fetchBookings();
         alert('ยกเลิกการจองสำเร็จ');
@@ -139,20 +135,26 @@ async function rejectBooking(bookingId) {
     }
 }
 
-function toggleDropdown(id) {
-    const dropdown = document.getElementById(id);
-    const icon = event.currentTarget.querySelector('[data-feather="chevron-down"]');
+// ฟังก์ชันสำหรับ toggle dropdown
+window.toggleDropdown = function(dropdownId, event) {
+    const dropdown = document.getElementById(dropdownId);
+    if (!dropdown) return;
+
+    const button = event.currentTarget;
+    const icon = button.querySelector('[data-feather="chevron-down"]');
     
+    // Toggle dropdown
     dropdown.classList.toggle('hidden');
     
-    if (dropdown.classList.contains('hidden')) {
-        icon.style.transform = 'rotate(0deg)';
-    } else {
-        icon.style.transform = 'rotate(180deg)';
+    // Rotate icon
+    if (icon) {
+        icon.style.transform = dropdown.classList.contains('hidden') ? 
+            'rotate(0deg)' : 'rotate(180deg)';
     }
-    
+
+    // Re-render Feather icons
     feather.replace();
-}
+};
 
 window.clearTable = async function() {
     if (confirm('คุณต้องการล้างตารางหรือไม่? ข้อมูลจะถูกลบถาวร')) {
@@ -188,19 +190,37 @@ async function updateNotificationBadge() {
         const count = snapshot.size;
         
         const badge = document.getElementById('notification-badge');
-        if (count > 0) {
-            badge.textContent = count;
-            badge.classList.remove('hidden');
-        } else {
-            badge.classList.add('hidden');
+        if (badge) {
+            if (count > 0) {
+                badge.textContent = count;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
         }
     } catch (error) {
         console.error("Error fetching notification count:", error);
     }
 }
 
+// Setup dropdowns when the page loads
+function setupDropdowns() {
+    // Meeting Room dropdown is always open by default (since this is the meeting room page)
+    const meetingRoomDropdown = document.getElementById('meetingRoomDropdown');
+    if (meetingRoomDropdown) {
+        meetingRoomDropdown.classList.remove('hidden');
+        const button = meetingRoomDropdown.previousElementSibling;
+        const icon = button?.querySelector('[data-feather="chevron-down"]');
+        if (icon) {
+            icon.style.transform = 'rotate(180deg)';
+        }
+    }
+}
+
+// Initialize page
 document.addEventListener('DOMContentLoaded', () => {
     feather.replace();
+    setupDropdowns();
     fetchBookings();
     updateNotificationBadge();
 });

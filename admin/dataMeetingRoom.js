@@ -32,30 +32,20 @@ async function fetchApprovedBookings() {
             const booking = doc.data();
             const row = document.createElement("tr");
             row.innerHTML = `
-                <td class="border px-4 py-2">#${doc.id}</td>
-                <td class="border px-4 py-2">${booking.mainBooker}</td>
-                <td class="border px-4 py-2">${booking.room_type}</td>
-                <td class="border px-4 py-2">${new Date(booking.created_at).toLocaleDateString("th-TH")}</td>
-                <td class="border px-4 py-2">${booking.status}</td>
-                <td class="border px-4 py-2">
-                    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded mr-2">
+                <td class="py-3 px-4">#${doc.id}</td>
+                <td class="py-3 px-4">${booking.mainBooker}</td>
+                <td class="py-3 px-4">${booking.room_type}</td>
+                <td class="py-3 px-4">${new Date(booking.created_at).toLocaleDateString("th-TH")}</td>
+                <td class="py-3 px-4">${booking.status}</td>
+                <td class="py-3 px-4">
+                    <button onclick="showDetails('${doc.id}')" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded mr-2">
                         แสดง
                     </button>
-                    <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded" onclick="deleteBooking('${doc.id}')">
+                    <button onclick="deleteBooking('${doc.id}')" class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded">
                         ยกเลิก
                     </button>
                 </td>
             `;
-
-            const showButton = row.querySelector(".bg-blue-500");
-            showButton.addEventListener("click", function() {
-                sessionStorage.setItem('selectedBooking', JSON.stringify({
-                    id: doc.id,
-                    ...booking
-                }));
-                window.location.href = "adminDetail.html";
-            });
-
             bookingsTable.appendChild(row);
         });
     } catch (error) {
@@ -64,7 +54,14 @@ async function fetchApprovedBookings() {
     }
 }
 
-window.deleteBooking = async function (bookingId) {
+window.showDetails = function(bookingId) {
+    sessionStorage.setItem('selectedBooking', JSON.stringify({
+        id: bookingId,
+    }));
+    window.location.href = "adminDetail.html";
+};
+
+window.deleteBooking = async function(bookingId) {
     if (confirm('คุณต้องการยกเลิกการจองนี้หรือไม่?')) {
         try {
             await deleteDoc(doc(db, 'bookingmeeting', bookingId));
@@ -77,20 +74,28 @@ window.deleteBooking = async function (bookingId) {
     }
 };
 
-function toggleDropdown(id, event) {
-    const dropdown = document.getElementById(id);
-    const icon = event.currentTarget.querySelector('[data-feather="chevron-down"]');
+// ฟังก์ชันสำหรับ toggle dropdown
+window.toggleDropdown = function(dropdownId, event) {
+    // หา dropdown element
+    const dropdown = document.getElementById(dropdownId);
+    if (!dropdown) return;
 
+    // หา icon element จากปุ่มที่ถูกคลิก
+    const button = event.currentTarget;
+    const icon = button.querySelector('[data-feather="chevron-down"]');
+    
+    // Toggle dropdown
     dropdown.classList.toggle('hidden');
-
-    if (dropdown.classList.contains('hidden')) {
-        icon.style.transform = 'rotate(0deg)';
-    } else {
-        icon.style.transform = 'rotate(180deg)';
+    
+    // Rotate icon
+    if (icon) {
+        icon.style.transform = dropdown.classList.contains('hidden') ? 
+            'rotate(0deg)' : 'rotate(180deg)';
     }
 
+    // Re-render Feather icons
     feather.replace();
-}
+};
 
 async function updateNotificationBadge() {
     try {
@@ -102,21 +107,54 @@ async function updateNotificationBadge() {
 
         const snapshot = await getDocs(q);
         const count = snapshot.size;
-
         const badge = document.getElementById('notification-badge');
-        if (count > 0) {
-            badge.textContent = count;
-            badge.classList.remove('hidden');
-        } else {
-            badge.classList.add('hidden');
+        
+        if (badge) {
+            if (count > 0) {
+                badge.textContent = count;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
         }
     } catch (error) {
         console.error("Error fetching notification count:", error);
     }
 }
 
+// Setup all dropdowns when the page loads
+function setupDropdowns() {
+    // Meeting Room dropdown is always open by default (since this is the meeting room page)
+    const meetingRoomDropdown = document.getElementById('meetingRoomDropdown');
+    if (meetingRoomDropdown) {
+        meetingRoomDropdown.classList.remove('hidden');
+        const button = meetingRoomDropdown.previousElementSibling;
+        const icon = button?.querySelector('[data-feather="chevron-down"]');
+        if (icon) {
+            icon.style.transform = 'rotate(180deg)';
+        }
+    }
+
+    // Add click event listeners to all dropdown buttons
+    document.querySelectorAll('button[onclick^="toggleDropdown"]').forEach(button => {
+        const dropdownId = button.onclick.toString().match(/'([^']+)'/)[1];
+        const dropdown = document.getElementById(dropdownId);
+        const icon = button.querySelector('[data-feather="chevron-down"]');
+        
+        // Set initial state
+        if (dropdown) {
+            dropdown.classList.add('hidden');
+        }
+        if (icon) {
+            icon.style.transform = 'rotate(0deg)';
+        }
+    });
+}
+
+// Initialize page
 document.addEventListener('DOMContentLoaded', () => {
     feather.replace();
+    setupDropdowns();
     fetchApprovedBookings();
     updateNotificationBadge();
 });

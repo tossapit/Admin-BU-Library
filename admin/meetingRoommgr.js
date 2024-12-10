@@ -43,7 +43,7 @@ async function loadRooms() {
    });
 }
 
-document.getElementById('roomForm').addEventListener('submit', async (e) => {
+document.getElementById('roomForm')?.addEventListener('submit', async (e) => {
    e.preventDefault();
    
    const roomName = document.getElementById('roomName').value;
@@ -90,28 +90,66 @@ async function updateNotificationBadge() {
         const count = snapshot.size;
         
         const badge = document.getElementById('notification-badge');
-        if (count > 0) {
-            badge.textContent = count;
-            badge.classList.remove('hidden');
-        } else {
-            badge.classList.add('hidden');
+        if (badge) {
+            if (count > 0) {
+                badge.textContent = count;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
         }
     } catch (error) {
         console.error("Error fetching notification count:", error);
     }
 }
 
-window.toggleDropdown = function(id) {
-   const dropdown = document.getElementById(id);
-   const icon = event.currentTarget.querySelector('[data-feather="chevron-down"]');
-   
-   dropdown.classList.toggle('hidden');
-   icon.style.transform = dropdown.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
-   feather.replace();
+// ฟังก์ชันสำหรับ toggle dropdown แบบใหม่
+window.toggleDropdown = function(dropdownId, event) {
+    event = event || window.event; // รองรับ event ทั้งแบบใหม่และเก่า
+    const dropdown = document.getElementById(dropdownId);
+    
+    if (!dropdown) return;
+    
+    // หา icon จากปุ่มที่ถูกคลิก
+    const button = event.currentTarget;
+    const icon = button.querySelector('[data-feather="chevron-down"]');
+    
+    // Toggle dropdown
+    dropdown.classList.toggle('hidden');
+    
+    // หมุน icon (ถ้ามี)
+    if (icon) {
+        icon.style.transform = dropdown.classList.contains('hidden') ? 
+            'rotate(0deg)' : 'rotate(180deg)';
+    }
+
+    // Re-render Feather icons
+    feather.replace();
 };
+
+// Setup เริ่มต้น
+function setupInitialDropdowns() {
+    // เปิด Meeting Room dropdown เป็นค่าเริ่มต้น
+    const meetingRoomDropdown = document.getElementById('meetingRoom');
+    if (meetingRoomDropdown) {
+        meetingRoomDropdown.classList.remove('hidden');
+        const button = meetingRoomDropdown.previousElementSibling;
+        const icon = button?.querySelector('[data-feather="chevron-down"]');
+        if (icon) {
+            icon.style.transform = 'rotate(180deg)';
+        }
+    }
+
+    // ตั้งค่า event listeners สำหรับทุกปุ่ม dropdown
+    document.querySelectorAll('button[onclick*="toggleDropdown"]').forEach(button => {
+        const dropdownId = button.getAttribute('onclick').match(/'([^']+)'/)[1];
+        button.onclick = (event) => toggleDropdown(dropdownId, event);
+    });
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     feather.replace();
+    setupInitialDropdowns();
     loadRooms();
-    updateNotificationBadge(); // Add this line
- });
+    updateNotificationBadge();
+});

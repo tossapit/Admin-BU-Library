@@ -22,7 +22,7 @@ async function fetchBookings() {
         const q = query(
             collection(db, 'bookings'),
             where('room_type', '==', 'Meeting Room'),
-            where('status', '==', 'รออนุมัติ')
+            where('status', '==', 'รออนุมัติ')  // เพิ่ม condition นี้
         );
         
         const snapshot = await getDocs(q);
@@ -150,15 +150,13 @@ async function rejectBooking(bookingId) {
         
         if (bookingSnap.exists()) {
             const bookingData = bookingSnap.data();
-            if (bookingData.assignedRoom) {
-                const roomRef = doc(db, 'meetingRooms', bookingData.assignedRoom);
-                await updateDoc(roomRef, {
-                    status: 'ว่าง',
-                    currentBooking: null,
-                    lastUpdated: new Date().toISOString()
-                });
-            }
             
+            // แทนที่จะลบข้อมูล เราจะอัพเดทสถานะเป็น 'ยกเลิก'
+            await updateDoc(bookingRef, {
+                status: 'ยกเลิก'
+            });
+            
+            // เพิ่มข้อมูลในประวัติการจอง
             const historyMeetingRef = doc(db, 'historymeeting', bookingId);
             await setDoc(historyMeetingRef, {
                 ...bookingData,
@@ -169,7 +167,7 @@ async function rejectBooking(bookingId) {
             });
         }
 
-        await deleteDoc(bookingRef);
+        // แทนที่จะใช้ deleteDoc เราแค่ refresh ตารางใหม่
         fetchBookings();
         alert('ยกเลิกการจองสำเร็จ');
     } catch (error) {

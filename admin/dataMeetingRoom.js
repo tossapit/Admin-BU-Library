@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-import { getFirestore, collection, getDocs, query, where, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+import { getFirestore, collection, getDocs, deleteDoc, doc, query, where, updateDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyCTRAyaI-eBBfWUjMSv1XprKAaIDlacy3g",
@@ -61,14 +61,33 @@ window.showDetails = function(bookingId) {
     window.location.href = "adminDetail.html";
 };
 
+// แก้ไขฟังก์ชัน deleteBooking ใน dataMeetingRoom.js
 window.deleteBooking = async function(bookingId) {
     if (confirm('คุณต้องการยกเลิกการจองนี้หรือไม่?')) {
         try {
+            // ค้นหาห้องที่มี currentBooking ตรงกับ bookingId
+            const roomsRef = collection(db, 'meetingRooms');
+            const q = query(roomsRef, where('currentBooking', '==', bookingId));
+            const roomSnapshot = await getDocs(q);
+
+            // อัพเดทสถานะห้อง
+            if (!roomSnapshot.empty) {
+                const roomDoc = roomSnapshot.docs[0];
+                await updateDoc(doc(db, 'meetingRooms', roomDoc.id), {
+                    status: 'ว่าง',
+                    currentBooking: null,
+                    lastUpdated: new Date().toISOString()
+                });
+                console.log("Updated room status:", roomDoc.id);
+            }
+
+            // ลบข้อมูลการจอง
             await deleteDoc(doc(db, 'bookingmeeting', bookingId));
             alert('ยกเลิกการจองสำเร็จ');
             fetchApprovedBookings();
+            
         } catch (error) {
-            console.error("Error deleting booking:", error);
+            console.error("Error in deleteBooking:", error);
             alert('เกิดข้อผิดพลาดในการยกเลิกการจอง');
         }
     }

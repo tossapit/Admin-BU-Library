@@ -56,6 +56,27 @@ async function fetchBookings() {
     }
 }
 
+// เพิ่มฟังก์ชันนี้ก่อน async function approveBooking(bookingId)
+async function findAvailableRoom() {
+    try {
+        const roomsRef = collection(db, 'meetingRooms');
+        const q = query(roomsRef, where('status', '==', 'ว่าง'));
+        const snapshot = await getDocs(q);
+        
+        if (snapshot.empty) {
+            return null;
+        }
+        
+        return {
+            id: snapshot.docs[0].id,
+            ...snapshot.docs[0].data()
+        };
+    } catch (error) {
+        console.error("Error finding available room:", error);
+        return null;
+    }
+}
+
 window.confirmAction = (bookingId, action) => {
     const message = action === 'approve' ? 'อนุมัติ' : 'ยกเลิก';
     const warningMessage = action === 'reject' ? '\n(ข้อมูลการจองจะถูกลบออกจากระบบ)' : '';
@@ -70,6 +91,13 @@ window.confirmAction = (bookingId, action) => {
 
 async function approveBooking(bookingId) {
     try {
+        const availableRoom = await findAvailableRoom();
+        
+        if (!availableRoom) {
+            alert('ไม่มีห้องว่างในขณะนี้ กรุณารอห้องว่าง');
+            return;
+        }
+
         const bookingRef = doc(db, 'bookings', bookingId);
         const bookingSnap = await getDoc(bookingRef);
         if (!bookingSnap.exists()) {
@@ -81,7 +109,14 @@ async function approveBooking(bookingId) {
         await updateDoc(bookingRef, { 
             status: 'อนุมัติ' 
         });
-        
+
+        const roomRef = doc(db, 'meetingRooms', availableRoom.id);
+        await updateDoc(roomRef, {
+            status: 'ไม่ว่าง',
+            currentBooking: bookingId,
+            lastUpdated: new Date().toISOString()
+        });
+
         // Add to bookingmeeting collection
         const bookingMeetingRef = doc(db, 'bookingmeeting', bookingId);
         await setDoc(bookingMeetingRef, {
@@ -115,6 +150,14 @@ async function rejectBooking(bookingId) {
         
         if (bookingSnap.exists()) {
             const bookingData = bookingSnap.data();
+            if (bookingData.assignedRoom) {
+                const roomRef = doc(db, 'meetingRooms', bookingData.assignedRoom);
+                await updateDoc(roomRef, {
+                    status: 'ว่าง',
+                    currentBooking: null,
+                    lastUpdated: new Date().toISOString()
+                });
+            }
             
             const historyMeetingRef = doc(db, 'historymeeting', bookingId);
             await setDoc(historyMeetingRef, {

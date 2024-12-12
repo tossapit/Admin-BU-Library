@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,63 +9,85 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
+
 <body class="bg-gray-100 flex">
     <!-- Sidebar -->
     <div class="w-[280px] bg-[#1e2124] min-h-screen p-4 fixed left-0 top-0 text-white flex flex-col">
         <!-- Sidebar Header -->
-        <div class="p-3.5 px-4 flex items-center justify-center gap-2 text-xl font-semibold border-b border-white/10 mb-4">             
-            <img src="/img_home_page/pngegg 2.png" alt="University Logo" class="w-30 h-10 object-contain">         
+        <div
+            class="p-3.5 px-4 flex items-center justify-center gap-2 text-xl font-semibold border-b border-white/10 mb-4">
+            <img src="/img_home_page/pngegg 2.png" alt="University Logo" class="w-30 h-10 object-contain">
         </div>
         <!-- Navigation Menu -->
         <ul class="flex flex-col gap-1">
             <li>
-                <a href="dashBoard.html" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 rounded-lg transition-colors duration-200">
+                <a href="dashBoard.html"
+                    class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 rounded-lg transition-colors duration-200">
                     <i data-feather="bar-chart-2" class="w-4 h-4"></i>
                     Dashboard
                 </a>
             </li>
             <!-- MeetingRoom Dropdown -->
             <li class="space-y-1">
-                <button  class="w-full flex items-center justify-between px-4 py-3 text-white/70 hover:bg-white/10 rounded-lg transition-all duration-200">
+                <button
+                    class="w-full flex items-center justify-between px-4 py-3 text-white/70 hover:bg-white/10 rounded-lg transition-all duration-200"
+                    onclick="toggleDropdown('meetingRoomDropdown')">
                     <div class="flex items-center gap-3">
                         <i data-feather="message-square" class="w-4 h-4"></i>
                         MeetingRoom
                     </div>
                     <i data-feather="chevron-down" class="w-4 h-4 transition-transform duration-200"></i>
                 </button>
-                <ul id="meetingRoomDropdown" class="hidden ml-8 space-y-1 text-white/70 ">
-                    <li><a href="dataMeetingRoom.html" class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">ข้อมูลการจอง</a></li>
-                    <li><a href="approveMeetingRoom.html" class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200 relative">
-                        อนุมัติการจอง
-                        <div id="notification-badge" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</div>
-                    </a></li>
+                <ul id="meetingRoomDropdown" class="hidden ml-8 space-y-1 text-white/70">
+                    <li><a href="dataMeetingRoom.html"
+                            class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">ข้อมูลการจอง</a>
+                    </li>
+                    <li><a href="approveMeetingRoom.html"
+                            class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200 relative">
+                            อนุมัติการจอง
+                            <div id="notification-badge"
+                                class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                                0</div>
+                        </a></li>
                     <li><a href="meetingRoommgr.html"
-                        class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">จัดการห้อง</a>
+                            class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">จัดการห้อง</a>
                     </li>
                     <li><a href="historyMeeting.html"
-                        class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">ประวัติการจอง</a>
+                            class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">ประวัติการจอง</a>
                     </li>
                 </ul>
             </li>
             <!-- MovieRoom Dropdown -->
             <li class="space-y-1">
-                <button class="w-full flex items-center justify-between px-4 py-3 text-white/70 hover:bg-white/10 rounded-lg transition-all duration-200" onclick="toggleDropdown('meetingRoom')">
+                <button
+                    class="w-full flex items-center justify-between px-4 py-3 text-white/70 hover:bg-white/10 rounded-lg transition-all duration-200"
+                    onclick="toggleDropdown('movieRoomDropdown')">
                     <div class="flex items-center gap-3">
                         <i data-feather="film" class="w-4 h-4"></i>
                         MovieRoom
                     </div>
                     <i data-feather="chevron-down" class="w-4 h-4 transition-transform duration-200"></i>
                 </button>
-                <ul id="movieRoom" class="ml-8 space-y-1 text-white/70">
-                    <li><a href="#" class="block py-2 px-4 bg-blue-600 rounded-lg transition-colors duration-200">ข้อมูลการจอง</a></li>
-                    <li><a href="approveMovieRoom.html" class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">อนุมัติการจอง</a></li>
-                    <li><a href="movieRoommgr.html" class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">จัดการห้อง</a></li>
-                    <li><a href="historyMovie.html" class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">ประวัติการจอง</a></li>
+                <ul id="movieRoomDropdown" class="ml-8 space-y-1 text-white/70">
+                    <li><a href="#"
+                            class="block py-2 px-4 bg-blue-600 rounded-lg transition-colors duration-200">ข้อมูลการจอง</a>
+                    </li>
+                    <li><a href="approveMovieRoom.html"
+                            class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">อนุมัติการจอง</a>
+                    </li>
+                    <li><a href="movieRoommgr.html"
+                            class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">จัดการห้อง</a>
+                    </li>
+                    <li><a href="historyMovie.html"
+                            class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">ประวัติการจอง</a>
+                    </li>
                 </ul>
             </li>
             <!-- BoardGame Dropdown -->
             <li class="space-y-1">
-                <button class="w-full flex items-center justify-between px-4 py-3 text-white/70 hover:bg-white/10 rounded-lg transition-all duration-200" onclick="toggleDropdown('boardGame')">
+                <button
+                    class="w-full flex items-center justify-between px-4 py-3 text-white/70 hover:bg-white/10 rounded-lg transition-all duration-200"
+                    onclick="toggleDropdown('boardGame')">
                     <div class="flex items-center gap-3">
                         <i class="fa-solid fa-dice"></i>
                         BoardGame
@@ -72,21 +95,26 @@
                     <i data-feather="chevron-down" class="w-4 h-4 transition-transform duration-200"></i>
                 </button>
                 <ul id="boardGame" class="hidden ml-8 space-y-1 text-white/70">
-                    <li><a href="dataBoardGame.html" class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">ข้อมูลการจอง</a></li>
-                    <li><a href="addBoardGame.html" class="block py-2 px-4 bg-blue-600 rounded-lg transition-colors duration-200">เพิ่มบอร์ดเกม</a></li>
-                    
+                    <li><a href="dataBoardGame.html"
+                            class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">ข้อมูลการจอง</a>
+                    </li>
+                    <li><a href="addBoardGame.html"
+                            class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">เพิ่มบอร์ดเกม</a>
+                    </li>
+
                 </ul>
             </li>
         </ul>
         <!-- Logout Button -->
         <div class="mt-auto">
-            <button class="w-auto flex items-center justify-start gap-3 px-2 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg transition-all duration-200">
+            <button
+                class="w-auto flex items-center justify-start gap-3 px-2 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg transition-all duration-200">
                 <i data-feather="log-out" class="w-4 h-4"></i>
                 Logout
             </button>
         </div>
     </div>
-    
+
     <!-- Main Content -->
     <div class="ml-[280px] p-6 w-full">
         <!-- Booking Table Section -->
@@ -104,11 +132,12 @@
                     </tr>
                 </thead>
                 <tbody>
-                    
+
                 </tbody>
             </table>
         </div>
     </div>
     <script type="module" src="dataMovieRoom.js"></script>
 </body>
+
 </html>

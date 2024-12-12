@@ -177,23 +177,33 @@ async function rejectBooking(bookingId) {
 }
 
 // ฟังก์ชันสำหรับ toggle dropdown
-window.toggleDropdown = function(dropdownId, event) {
+window.toggleDropdown = function(dropdownId) {
     const dropdown = document.getElementById(dropdownId);
     if (!dropdown) return;
 
-    const button = event.currentTarget;
-    const icon = button.querySelector('[data-feather="chevron-down"]');
-    
-    // Toggle dropdown
+    // ปิด dropdowns อื่นๆ
+    const allDropdowns = document.querySelectorAll('[id$="Dropdown"]');
+    allDropdowns.forEach(item => {
+        if (item.id !== dropdownId) {
+            item.classList.add('hidden');
+            const button = item.previousElementSibling;
+            const icon = button?.querySelector('[data-feather="chevron-down"]');
+            if (icon) {
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+    });
+
+    // Toggle current dropdown
     dropdown.classList.toggle('hidden');
+    const button = dropdown.previousElementSibling;
+    const icon = button?.querySelector('[data-feather="chevron-down"]');
     
-    // Rotate icon
     if (icon) {
         icon.style.transform = dropdown.classList.contains('hidden') ? 
             'rotate(0deg)' : 'rotate(180deg)';
     }
 
-    // Re-render Feather icons
     feather.replace();
 };
 
@@ -246,16 +256,25 @@ async function updateNotificationBadge() {
 
 // Setup dropdowns when the page loads
 function setupDropdowns() {
-    // Meeting Room dropdown is always open by default (since this is the meeting room page)
-    const meetingRoomDropdown = document.getElementById('movieRoomDropdown');
-    if (meetingRoomDropdown) {
-        meetingRoomDropdown.classList.remove('hidden');
-        const button = meetingRoomDropdown.previousElementSibling;
+    // Movie Room dropdown opens by default on this page
+    const movieRoomDropdown = document.getElementById('movieRoomDropdown');
+    if (movieRoomDropdown) {
+        movieRoomDropdown.classList.remove('hidden');
+        const button = movieRoomDropdown.previousElementSibling;
         const icon = button?.querySelector('[data-feather="chevron-down"]');
         if (icon) {
             icon.style.transform = 'rotate(180deg)';
         }
     }
+
+    // Make sure other dropdowns are hidden
+    const otherDropdowns = ['meetingRoomDropdown', 'boardGameDropdown'];
+    otherDropdowns.forEach(id => {
+        const dropdown = document.getElementById(id);
+        if (dropdown) {
+            dropdown.classList.add('hidden');
+        }
+    });
 }
 
 // Initialize page

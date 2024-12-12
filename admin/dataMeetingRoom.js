@@ -116,30 +116,81 @@ window.toggleDropdown = function(dropdownId, event) {
     feather.replace();
 };
 
-async function updateNotificationBadge() {
+async function updateNotificationBadges() {
     try {
-        const q = query(
+        // Check Meeting Room notifications
+        const meetingQuery = query(
             collection(db, 'bookings'),
             where('room_type', '==', 'Meeting Room'),
             where('status', '==', 'รออนุมัติ')
         );
-
-        const snapshot = await getDocs(q);
-        const count = snapshot.size;
-        const badge = document.getElementById('notification-badge');
+        const meetingSnapshot = await getDocs(meetingQuery);
+        const meetingCount = meetingSnapshot.size;
         
-        if (badge) {
-            if (count > 0) {
-                badge.textContent = count;
-                badge.classList.remove('hidden');
+        const meetingBadge = document.getElementById('meeting-notification-badge');
+        const meetingDropdown = document.getElementById('meetingRoomDropdown');
+        
+        if (meetingBadge && meetingDropdown) {
+            if (meetingCount > 0) {
+                // ถ้ามีจำนวนแจ้งเตือนใหม่มากกว่าที่เก็บไว้ก่อนหน้า ให้เปิด dropdown
+                if (meetingBadge.dataset.prevCount === undefined || 
+                    parseInt(meetingBadge.dataset.prevCount) < meetingCount) {
+                    meetingDropdown.classList.remove('hidden');
+                    const button = meetingDropdown.previousElementSibling;
+                    const icon = button?.querySelector('[data-feather="chevron-down"]');
+                    if (icon) {
+                        icon.style.transform = 'rotate(180deg)';
+                    }
+                    feather.replace();
+                }
+                meetingBadge.textContent = meetingCount;
+                meetingBadge.classList.remove('hidden');
+                meetingBadge.dataset.prevCount = meetingCount;
             } else {
-                badge.classList.add('hidden');
+                meetingBadge.classList.add('hidden');
+                meetingBadge.dataset.prevCount = 0;
+            }
+        }
+
+        // Check Movie Room notifications
+        const movieQuery = query(
+            collection(db, 'bookings'),
+            where('room_type', '==', 'Movie Room'),
+            where('status', '==', 'รออนุมัติ')
+        );
+        const movieSnapshot = await getDocs(movieQuery);
+        const movieCount = movieSnapshot.size;
+        
+        const movieBadge = document.getElementById('movie-notification-badge');
+        const movieDropdown = document.getElementById('movieRoom');
+        
+        if (movieBadge && movieDropdown) {
+            if (movieCount > 0) {
+                // ถ้ามีจำนวนแจ้งเตือนใหม่มากกว่าที่เก็บไว้ก่อนหน้า ให้เปิด dropdown
+                if (movieBadge.dataset.prevCount === undefined || 
+                    parseInt(movieBadge.dataset.prevCount) < movieCount) {
+                    movieDropdown.classList.remove('hidden');
+                    const button = movieDropdown.previousElementSibling;
+                    const icon = button?.querySelector('[data-feather="chevron-down"]');
+                    if (icon) {
+                        icon.style.transform = 'rotate(180deg)';
+                    }
+                    feather.replace();
+                }
+                movieBadge.textContent = movieCount;
+                movieBadge.classList.remove('hidden');
+                movieBadge.dataset.prevCount = movieCount;
+            } else {
+                movieBadge.classList.add('hidden');
+                movieBadge.dataset.prevCount = 0;
             }
         }
     } catch (error) {
-        console.error("Error fetching notification count:", error);
+        console.error("Error fetching notification counts:", error);
     }
 }
+
+
 
 // Setup all dropdowns when the page loads
 function setupDropdowns() {
@@ -175,5 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
     feather.replace();
     setupDropdowns();
     fetchApprovedBookings();
-    updateNotificationBadge();
+    updateNotificationBadges();
 });
+
+setInterval(updateNotificationBadges, 500);

@@ -34,7 +34,10 @@
                 </button>
                 <ul id="meetingRoom" class="hidden ml-8 space-y-1 text-white/70">
                     <li><a href="dataMeetingRoom.html" class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">ข้อมูลการจอง</a></li>
-                    <li><a href="approveMeetingRoom.html" class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">อนุมัติการจอง</a></li>
+                    <li><a href="approveMeetingRoom.html" class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200 relative">
+                        อนุมัติการจอง
+                        <div id="meeting-notification-badge" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</div>
+                    </a></li>
                     <li><a href="movieRoommgr.html" class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">จัดการห้อง</a></li>
                     <li><a href="historyMovie.html" class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">ประวัติการจอง</a></li>
                 </ul>
@@ -50,7 +53,10 @@
                 </button>
                 <ul id="movieRoom" class="ml-8 space-y-1 text-white/70">
                     <li><a href="dataMovieRoom.html" class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">ข้อมูลการจอง</a></li>
-                    <li><a href="approveMovieRoom.html" class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">อนุมัติการจอง</a></li>
+                    <li><a href="approveMovieRoom.html" class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200 relative">
+                        อนุมัติการจอง
+                        <div id="movie-notification-badge" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</div>
+                    </a></li>
                     <li><a href="movieRoommgr.html" class="block py-2 px-4 hover:bg-white/10 rounded-lg transition-colors duration-200">จัดการห้อง</a></li>
                     <li><a href="historyMovie.html" class="block py-2 px-4 bg-blue-600 rounded-lg transition-colors duration-200">ประวัติการจอง</a></li>
                 </ul>

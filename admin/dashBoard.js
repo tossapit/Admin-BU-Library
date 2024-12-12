@@ -105,28 +105,80 @@ window.toggleBookingSystem = async function(isOpen) {
     }
  };
 
- async function updateNotificationBadge() {
+ async function updateNotificationBadges() {
     try {
-        const q = query(
+        // Check Meeting Room notifications
+        const meetingQuery = query(
             collection(db, 'bookings'),
             where('room_type', '==', 'Meeting Room'),
             where('status', '==', 'รออนุมัติ')
         );
+        const meetingSnapshot = await getDocs(meetingQuery);
+        const meetingCount = meetingSnapshot.size;
         
-        const snapshot = await getDocs(q);
-        const count = snapshot.size;
+        const meetingBadge = document.getElementById('meeting-notification-badge');
+        const meetingDropdown = document.getElementById('meetingRoom');
         
-        const badge = document.getElementById('notification-badge');
-        if (count > 0) {
-            badge.textContent = count;
-            badge.classList.remove('hidden');
-        } else {
-            badge.classList.add('hidden');
+        if (meetingBadge && meetingDropdown) {
+            if (meetingCount > 0) {
+                meetingBadge.textContent = meetingCount;
+                meetingBadge.classList.remove('hidden');
+                // เปิด dropdown เมื่อมีการแจ้งเตือนใหม่
+                if (meetingBadge.dataset.prevCount === undefined || 
+                    parseInt(meetingBadge.dataset.prevCount) < meetingCount) {
+                    meetingDropdown.classList.remove('hidden');
+                    const button = meetingDropdown.previousElementSibling;
+                    const icon = button?.querySelector('[data-feather="chevron-down"]');
+                    if (icon) {
+                        icon.style.transform = 'rotate(180deg)';
+                    }
+                    feather.replace();
+                }
+                meetingBadge.dataset.prevCount = meetingCount;
+            } else {
+                meetingBadge.classList.add('hidden');
+                meetingBadge.dataset.prevCount = 0;
+            }
+        }
+
+        // Check Movie Room notifications
+        const movieQuery = query(
+            collection(db, 'bookings'),
+            where('room_type', '==', 'Movie Room'),
+            where('status', '==', 'รออนุมัติ')
+        );
+        const movieSnapshot = await getDocs(movieQuery);
+        const movieCount = movieSnapshot.size;
+        
+        const movieBadge = document.getElementById('movie-notification-badge');
+        const movieDropdown = document.getElementById('movieRoom');
+        
+        if (movieBadge && movieDropdown) {
+            if (movieCount > 0) {
+                movieBadge.textContent = movieCount;
+                movieBadge.classList.remove('hidden');
+                // เปิด dropdown เมื่อมีการแจ้งเตือนใหม่
+                if (movieBadge.dataset.prevCount === undefined || 
+                    parseInt(movieBadge.dataset.prevCount) < movieCount) {
+                    movieDropdown.classList.remove('hidden');
+                    const button = movieDropdown.previousElementSibling;
+                    const icon = button?.querySelector('[data-feather="chevron-down"]');
+                    if (icon) {
+                        icon.style.transform = 'rotate(180deg)';
+                    }
+                    feather.replace();
+                }
+                movieBadge.dataset.prevCount = movieCount;
+            } else {
+                movieBadge.classList.add('hidden');
+                movieBadge.dataset.prevCount = 0;
+            }
         }
     } catch (error) {
-        console.error("Error fetching notification count:", error);
+        console.error("Error fetching notification counts:", error);
     }
 }
+
 
 // Dropdown functionality
 // Make toggleDropdown globally accessible
@@ -194,5 +246,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Add logout listener
     const logoutButton = document.querySelector('.mt-auto');
     logoutButton?.addEventListener('click', handleLogout);
+    updateNotificationBadges();
 });
 
+setInterval(updateNotificationBadges, 500);

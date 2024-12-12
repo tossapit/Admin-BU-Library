@@ -195,3 +195,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     const logoutButton = document.querySelector('.mt-auto');
     logoutButton?.addEventListener('click', handleLogout);
 });
+

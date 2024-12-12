@@ -230,7 +230,7 @@ async function updateNotificationBadge() {
         const snapshot = await getDocs(q);
         const count = snapshot.size;
         
-        const badge = document.getElementById('notification-badge');
+        const badge = document.getElementById('meeting-notification-badge');
         if (badge) {
             if (count > 0) {
                 badge.textContent = count;

@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-import { getFirestore, collection, getDocs, addDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyCTRAyaI-eBBfWUjMSv1XprKAaIDlacy3g",
@@ -14,10 +14,52 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-document.addEventListener('DOMContentLoaded', () => {
-    feather.replace();
-    setupFormSubmission();
-});
+async function loadBoardGames() {
+    try {
+        const boardgamesRef = collection(db, 'boardgame');
+        const q = query(boardgamesRef, orderBy('bgame_id', 'asc'));
+        const snapshot = await getDocs(q);
+        const tableBody = document.getElementById('boardGameTableBody');
+        tableBody.innerHTML = '';
+
+        if (snapshot.empty) {
+            const emptyRow = document.createElement('tr');
+            emptyRow.innerHTML = `
+                <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500">
+                    ไม่พบข้อมูลบอร์ดเกม
+                </td>
+            `;
+            tableBody.appendChild(emptyRow);
+            return;
+        }
+
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    ${data.bgame_id}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    ${data.name_bg}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    ${data.quantity}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <button onclick="openDeleteModal('${doc.id}')" class="text-red-600 hover:text-red-900">
+                        <i data-feather="trash-2" class="w-4 h-4"></i>
+                    </button>
+                </td>
+            `;
+            tableBody.appendChild(row);
+        });
+        feather.replace();
+    } catch (error) {
+        console.error("Error loading board games:", error);
+        alert('เกิดข้อผิดพลาดในการโหลดข้อมูล: ' + error.message);
+    }
+}
 
 async function getNextBoardgameId() {
     try {
@@ -62,7 +104,8 @@ function setupFormSubmission() {
 
             await addDoc(collection(db, 'boardgame'), boardgameData);
             alert('บันทึกข้อมูลสำเร็จ');
-            window.location.href = 'dataBoardGame.html';
+            closeAddModal();
+            loadBoardGames();
 
         } catch (error) {
             console.error('Error:', error);
@@ -74,13 +117,22 @@ function setupFormSubmission() {
     });
 }
 
-window.toggleDropdown = function(id) {
-    const dropdown = document.getElementById(id);
-    const icon = event.currentTarget.querySelector('[data-feather="chevron-down"]');
-    
-    if (dropdown && icon) {
-        dropdown.classList.toggle('hidden');
-        icon.style.transform = dropdown.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
-        feather.replace();
+// Add delete function to window object
+window.deleteBoardGame = async function(docId) {
+    try {
+        const docRef = doc(db, 'boardgame', docId);
+        await deleteDoc(docRef);
+        closeDeleteModal();
+        loadBoardGames();
+        alert('ลบข้อมูลสำเร็จ');
+    } catch (error) {
+        console.error('Error:', error);
+        alert('เกิดข้อผิดพลาดในการลบข้อมูล: ' + error.message);
     }
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    feather.replace();
+    loadBoardGames();
+    setupFormSubmission();
+});

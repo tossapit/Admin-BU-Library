@@ -38,11 +38,8 @@ async function fetchApprovedBookings() {
                 <td class="py-3 px-4">${new Date(booking.created_at).toLocaleDateString("th-TH")}</td>
                 <td class="py-3 px-4">${booking.status}</td>
                 <td class="py-3 px-4">
-                    <button onclick="showDetails('${doc.id}')" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded mr-2">
-                        แสดง
-                    </button>
                     <button onclick="deleteBooking('${doc.id}')" class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded">
-                        ยกเลิก
+                        ลบ
                     </button>
                 </td>
             `;
@@ -63,7 +60,7 @@ window.showDetails = function(bookingId) {
 
 // แก้ไขฟังก์ชัน deleteBooking ใน dataMeetingRoom.js
 window.deleteBooking = async function(bookingId) {
-    if (confirm('คุณต้องการยกเลิกการจองนี้หรือไม่?')) {
+    if (confirm('คุณต้องการลบการจองนี้หรือไม่?')) {
         try {
             // ค้นหาห้องที่มี currentBooking ตรงกับ bookingId
             const roomsRef = collection(db, 'movieRooms');

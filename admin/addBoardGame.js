@@ -131,6 +131,56 @@ window.deleteBoardGame = async function(docId) {
     }
 }
 
+window.toggleDropdown = function(dropdownId, event) {
+    // ตรวจสอบ parameters
+    event = event || window.event;
+    if (!event) return;
+    
+    // หา dropdown element
+    const dropdown = document.getElementById(dropdownId);
+    if (!dropdown) return;
+
+    // หา icon จากปุ่มที่ถูกคลิก
+    const button = event.currentTarget;
+    const icon = button.querySelector('[data-feather="chevron-down"]');
+    
+    // Toggle dropdown
+    dropdown.classList.toggle('hidden');
+    
+    // หมุน icon ถ้ามี
+    if (icon) {
+        icon.style.transform = dropdown.classList.contains('hidden') ? 
+            'rotate(0deg)' : 'rotate(180deg)';
+    }
+
+    // Re-render Feather icons
+    feather.replace();
+};
+
+// Setup dropdowns
+function setupDropdowns() {
+    // ตั้งค่า event listeners สำหรับทุกปุ่ม dropdown
+    document.querySelectorAll('button[onclick*="toggleDropdown"]').forEach(button => {
+        const dropdownId = button.getAttribute('onclick').match(/'([^']+)'/)?.[1];
+        if (dropdownId) {
+            button.onclick = (event) => toggleDropdown(dropdownId, event);
+        }
+    });
+
+    // Setup initial state for dropdowns
+    const dropdowns = {
+        'meetingRoom': document.getElementById('meetingRoom'),
+        'movieRoom': document.getElementById('movieRoom'),
+        'boardGame': document.getElementById('boardGame')
+    };
+
+    Object.entries(dropdowns).forEach(([id, element]) => {
+        if (element) {
+            element.classList.add('hidden');
+        }
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     feather.replace();
     loadBoardGames();

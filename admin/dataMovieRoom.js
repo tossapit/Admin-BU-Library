@@ -20,7 +20,7 @@ async function fetchApprovedBookings() {
 
     try {
         const q = query(
-            collection(db, 'bookingmeeting'),
+            collection(db, 'bookingmovie'),
             where('room_type', '==', 'Movie Room'),
             where('status', '==', 'อนุมัติ')
         );

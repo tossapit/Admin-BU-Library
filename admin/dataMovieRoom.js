@@ -142,12 +142,12 @@ async function updateNotificationBadge() {
 }
 
 // Setup all dropdowns when the page loads
-function setupDropdowns() {
-    // Meeting Room dropdown is always open by default (since this is the meeting room page)
-    const meetingRoomDropdown = document.getElementById('movieRoomDropdown');
-    if (meetingRoomDropdown) {
-        meetingRoomDropdown.classList.remove('hidden');
-        const button = meetingRoomDropdown.previousElementSibling;
+function setupInitialDropdowns() {
+    // Movie Room dropdown is always open by default (since this is the movie room page)
+    const movieRoomDropdown = document.getElementById('movieRoomDropdown');
+    if (movieRoomDropdown) {
+        movieRoomDropdown.classList.remove('hidden');
+        const button = movieRoomDropdown.previousElementSibling;
         const icon = button?.querySelector('[data-feather="chevron-down"]');
         if (icon) {
             icon.style.transform = 'rotate(180deg)';
@@ -156,24 +156,15 @@ function setupDropdowns() {
 
     // Add click event listeners to all dropdown buttons
     document.querySelectorAll('button[onclick^="toggleDropdown"]').forEach(button => {
-        const dropdownId = button.onclick.toString().match(/'([^']+)'/)[1];
-        const dropdown = document.getElementById(dropdownId);
-        const icon = button.querySelector('[data-feather="chevron-down"]');
-        
-        // Set initial state
-        if (dropdown) {
-            dropdown.classList.add('hidden');
-        }
-        if (icon) {
-            icon.style.transform = 'rotate(0deg)';
-        }
+        const dropdownId = button.getAttribute('onclick').match(/'([^']+)'/)[1];
+        button.onclick = (event) => toggleDropdown(dropdownId, event);
     });
 }
 
 // Initialize page
 document.addEventListener('DOMContentLoaded', () => {
     feather.replace();
-    setupDropdowns();
+    setupInitialDropdowns();
     fetchApprovedBookings();
     updateNotificationBadge();
 });

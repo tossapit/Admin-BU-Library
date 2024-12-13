@@ -16,15 +16,31 @@ const db = getFirestore(app);
 
 async function updateStats() {
     try {
-        const [usersSnapshot, bookingsSnapshot, activeSnapshot] = await Promise.all([
-            getDocs(collection(db, 'users')),
-            getDocs(collection(db, 'bookings')),
-            getDocs(query(collection(db, 'bookings'), where('status', '==', 'active')))
+        // Fetch active bookings from both meeting and movie collections
+        const [activeMeetingSnapshot, activeMovieSnapshot] = await Promise.all([
+            getDocs(collection(db, 'bookingmeeting')),
+            getDocs(collection(db, 'bookingmovie'))
         ]);
 
-        document.getElementById('totalUsers').textContent = usersSnapshot.size;
-        document.getElementById('totalBookings').textContent = bookingsSnapshot.size;
-        document.getElementById('activeBookings').textContent = activeSnapshot.size;
+        // Calculate total active bookings
+        const totalActiveBookings = activeMeetingSnapshot.size + activeMovieSnapshot.size;
+
+        // Calculate total users (active bookings × 5 users per booking)
+        const totalUsers = totalActiveBookings * 5;
+
+        // Fetch total historical bookings
+        const [historyMeetingSnapshot, historyMovieSnapshot] = await Promise.all([
+            getDocs(collection(db, 'historymeeting')),
+            getDocs(collection(db, 'historymovie'))
+        ]);
+
+        // Calculate total historical bookings
+        const totalHistoricalBookings = historyMeetingSnapshot.size + historyMovieSnapshot.size;
+
+        // Update UI
+        document.getElementById('totalUsers').textContent = totalUsers;
+        document.getElementById('totalBookings').textContent = totalHistoricalBookings;
+        document.getElementById('activeBookings').textContent = totalActiveBookings;
     } catch (error) {
         console.error("Error fetching stats:", error);
     }
@@ -32,29 +48,48 @@ async function updateStats() {
 
 async function updateRoomStats() {
     try {
-        const rooms = ['Meeting Room', 'Movie Room', 'Board Game'];
-        const contentIds = ['meeting-content', 'movie-content', 'boardgame-content'];
+        // Define collections for each room type
+        const roomConfigs = [
+            {
+                type: 'Meeting Room',
+                contentId: 'meeting-content',
+                activeCollection: 'bookingmeeting',
+                historyCollection: 'historymeeting'
+            },
+            {
+                type: 'Movie Room',
+                contentId: 'movie-content',
+                activeCollection: 'bookingmovie',
+                historyCollection: 'historymovie'
+            },
+            {
+                type: 'Board Game',
+                contentId: 'boardgame-content',
+                activeCollection: 'bookingboardgame',
+                historyCollection: 'bookingboardgame' // ใช้คอลเลคชันเดียวกันเพราะเป็นประวัติปัจจุบัน
+            }
+        ];
         
-        for (let i = 0; i < rooms.length; i++) {
-            const roomType = rooms[i];
-            const contentId = contentIds[i];
-            
-            const [totalSnapshot, activeSnapshot] = await Promise.all([
-                getDocs(query(collection(db, 'bookings'), where('room_type', '==', roomType))),
-                getDocs(query(collection(db, 'bookings'), 
-                    where('room_type', '==', roomType),
-                    where('status', '==', 'active')))
+        for (const config of roomConfigs) {
+            const [activeBookings, totalHistory] = await Promise.all([
+                getDocs(collection(db, config.activeCollection)),
+                getDocs(collection(db, config.historyCollection))
             ]);
             
-            const content = document.getElementById(contentId);
+            const content = document.getElementById(config.contentId);
             if (content) {
                 const stats = content.getElementsByClassName('flex items-center justify-between');
-                stats[0].lastElementChild.textContent = totalSnapshot.size;
-                stats[1].lastElementChild.textContent = activeSnapshot.size;
-                
-                const usageRate = totalSnapshot.size ? 
-                    ((activeSnapshot.size / totalSnapshot.size) * 100).toFixed(1) : 0;
-                stats[2].querySelector('.flex.items-center').textContent = `${usageRate}%`;
+                if (config.type === 'Board Game') {
+                    // สำหรับบอร์ดเกม แสดงเฉพาะการจองทั้งหมด
+                    stats[0].lastElementChild.textContent = totalHistory.size;
+                } else {
+                    // สำหรับห้องประชุมและห้องดูหนัง แสดงทั้ง 3 ส่วน
+                    stats[0].lastElementChild.textContent = totalHistory.size;
+                    stats[1].lastElementChild.textContent = activeBookings.size;
+                    const usageRate = totalHistory.size ? 
+                        ((activeBookings.size / totalHistory.size) * 100).toFixed(1) : 0;
+                    stats[2].querySelector('.flex.items-center').textContent = `${usageRate}%`;
+                }
             }
         }
     } catch (error) {
@@ -232,6 +267,145 @@ function setupDropdowns() {
     });
 }
 
+let currentTimeRange = 'day';
+
+window.changeTimeRange = async function(timeRange) {
+    currentTimeRange = timeRange;
+    updateRangeButtonStyles();
+    await updateBookingTable();
+};
+
+function updateRangeButtonStyles() {
+    ['day', 'month', 'year'].forEach(range => {
+        const button = document.getElementById(`${range}-range`);
+        if (button) {
+            if (range === currentTimeRange) {
+                button.classList.remove('bg-gray-100', 'hover:bg-gray-200', 'text-gray-700');
+                button.classList.add('bg-blue-700', 'text-white', 'hover:bg-blue-800');
+            } else {
+                button.classList.remove('bg-blue-600', 'text-white', 'hover:bg-blue-700');
+                button.classList.add('bg-gray-100', 'hover:bg-gray-200', 'text-gray-700');
+            }
+        }
+    });
+}
+
+function formatDate(date, format = 'day') {
+    const d = new Date(date);
+    switch(format) {
+        case 'day':
+            return d.toLocaleDateString('th-TH', { day: 'numeric', month: 'long', year: 'numeric' });
+        case 'month':
+            return d.toLocaleDateString('th-TH', { month: 'long', year: 'numeric' });
+        case 'year':
+            return d.toLocaleDateString('th-TH', { year: 'numeric' });
+    }
+}
+
+async function updateBookingTable() {
+    try {
+        const tableBody = document.getElementById('bookingTableBody');
+        if (!tableBody) return;
+
+        tableBody.innerHTML = '';
+        const now = new Date();
+        let startDate, endDate;
+        let groupByFormat;
+
+        // กำหนดช่วงเวลาและฟอร์แมตการจัดกลุ่ม
+        switch(currentTimeRange) {
+            case 'day':
+                startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6); // 7 วันย้อนหลัง
+                endDate = now;
+                groupByFormat = 'day';
+                break;
+            case 'month':
+                startDate = new Date(now.getFullYear(), now.getMonth() - 5, 1); // 6 เดือนย้อนหลัง
+                endDate = now;
+                groupByFormat = 'month';
+                break;
+            case 'year':
+                startDate = new Date(now.getFullYear() - 4, 0, 1); // 5 ปีย้อนหลัง
+                endDate = now;
+                groupByFormat = 'year';
+                break;
+        }
+
+        // ดึงข้อมูลจาก Firebase
+        const [meetingHistory, movieHistory, boardGameHistory] = await Promise.all([
+            getDocs(query(collection(db, 'historymeeting'))),
+            getDocs(query(collection(db, 'historymovie'))),
+            getDocs(query(collection(db, 'bookingboardgame')))
+        ]);
+
+        // จัดกลุ่มข้อมูล
+        const bookingData = new Map();
+
+        // ฟังก์ชันช่วยจัดกลุ่มข้อมูล
+        function getGroupKey(date, format) {
+            const d = new Date(date);
+            switch(format) {
+                case 'day':
+                    return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+                case 'month':
+                    return `${d.getFullYear()}-${d.getMonth()}`;
+                case 'year':
+                    return `${d.getFullYear()}`;
+            }
+        }
+
+        // รวบรวมข้อมูลห้องประชุม
+        meetingHistory.forEach(doc => {
+            const data = doc.data();
+            const key = getGroupKey(data.created_at, groupByFormat);
+            if (!bookingData.has(key)) {
+                bookingData.set(key, { meeting: 0, movie: 0, boardgame: 0, date: new Date(data.created_at) });
+            }
+            bookingData.get(key).meeting++;
+        });
+
+        // รวบรวมข้อมูลห้องดูหนัง
+        movieHistory.forEach(doc => {
+            const data = doc.data();
+            const key = getGroupKey(data.created_at, groupByFormat);
+            if (!bookingData.has(key)) {
+                bookingData.set(key, { meeting: 0, movie: 0, boardgame: 0, date: new Date(data.created_at) });
+            }
+            bookingData.get(key).movie++;
+        });
+
+        // รวบรวมข้อมูลบอร์ดเกม
+        boardGameHistory.forEach(doc => {
+            const data = doc.data();
+            const key = getGroupKey(data.bbgame_date || data.created_at, groupByFormat);
+            if (!bookingData.has(key)) {
+                bookingData.set(key, { meeting: 0, movie: 0, boardgame: 0, date: new Date(data.bbgame_date || data.created_at) });
+            }
+            bookingData.get(key).boardgame++;
+        });
+
+        // แสดงผลในตาราง
+        const sortedData = Array.from(bookingData.entries())
+            .sort(([,a], [,b]) => b.date - a.date);
+
+        sortedData.forEach(([key, data]) => {
+            const row = document.createElement('tr');
+            const total = data.meeting + data.movie + data.boardgame;
+            row.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${formatDate(data.date, groupByFormat)}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${data.meeting}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${data.movie}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${data.boardgame}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${total}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+
+    } catch (error) {
+        console.error("Error updating booking table:", error);
+    }
+}
+
 // ปรับปรุง DOMContentLoaded event listener
 document.addEventListener('DOMContentLoaded', async () => {
     feather.replace();
@@ -239,14 +413,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     await Promise.all([
         updateStats(),
         updateRoomStats(),
-        updateNotificationBadge()
+        updateBookingTable(),
+        updateNotificationBadges()
     ]);
     showTab('meeting');
     
-    // Add logout listener
     const logoutButton = document.querySelector('.mt-auto');
     logoutButton?.addEventListener('click', handleLogout);
-    updateNotificationBadges();
 });
 
 setInterval(updateNotificationBadges, 500);

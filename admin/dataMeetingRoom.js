@@ -14,6 +14,12 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+function handleLogout() {
+    if (confirm("คุณต้องการออกจากระบบใช่หรือไม่?")) {
+        window.location.href = 'adminLogin.html';
+    }
+}
+
 async function fetchApprovedBookings() {
     const bookingsTable = document.querySelector('table tbody');
     if (!bookingsTable) return;
@@ -224,6 +230,9 @@ document.addEventListener('DOMContentLoaded', () => {
     setupDropdowns();
     fetchApprovedBookings();
     updateNotificationBadges();
+
+    const logoutButton = document.querySelector('.mt-auto');
+    logoutButton?.addEventListener('click', handleLogout);
 });
 
 setInterval(updateNotificationBadges, 500);

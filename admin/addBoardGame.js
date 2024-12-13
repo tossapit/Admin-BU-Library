@@ -196,8 +196,17 @@ function setupDropdowns() {
     });
 }
 
+function handleLogout() {
+    if (confirm("คุณต้องการออกจากระบบใช่หรือไม่?")) {
+        window.location.href = 'adminLogin.html';
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     feather.replace();
     loadBoardGames();
     setupFormSubmission();
+
+    const logoutButton = document.querySelector('.mt-auto');
+    logoutButton?.addEventListener('click', handleLogout);
 });

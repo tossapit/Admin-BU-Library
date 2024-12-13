@@ -208,12 +208,21 @@ function setupInitialDropdowns() {
     });
 }
 
+function handleLogout() {
+    if (confirm("คุณต้องการออกจากระบบใช่หรือไม่?")) {
+        window.location.href = 'adminLogin.html';
+    }
+}
+
 // Initialize page
 document.addEventListener('DOMContentLoaded', () => {
     feather.replace();
     setupInitialDropdowns();
     fetchApprovedBookings();
     updateNotificationBadges();
+
+    const logoutButton = document.querySelector('.mt-auto');
+    logoutButton?.addEventListener('click', handleLogout);
 });
 
 setInterval(updateNotificationBadges, 1000);

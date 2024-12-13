@@ -89,15 +89,20 @@ function setupFormSubmission() {
 
         try {
             const name_bg = document.getElementById('name_bg').value.trim();
+            const image_url = document.getElementById('image_url').value.trim();
             const quantity = parseInt(document.getElementById('quantity').value);
 
+            // Validation
             if (!name_bg) throw new Error('กรุณากรอกชื่อบอร์ดเกม');
+            if (!image_url) throw new Error('กรุณากรอก URL รูปภาพ');
+            if (!isValidUrl(image_url)) throw new Error('กรุณากรอก URL รูปภาพที่ถูกต้อง');
             if (isNaN(quantity) || quantity < 1) throw new Error('กรุณากรอกจำนวนบอร์ดเกมที่ถูกต้อง');
 
             const bgame_id = await getNextBoardgameId();
             const boardgameData = {
                 bgame_id,
                 name_bg,
+                image_url,
                 quantity,
                 created_at: new Date().toISOString()
             };
@@ -128,6 +133,16 @@ window.deleteBoardGame = async function(docId) {
     } catch (error) {
         console.error('Error:', error);
         alert('เกิดข้อผิดพลาดในการลบข้อมูล: ' + error.message);
+    }
+}
+
+// เพิ่มฟังก์ชันตรวจสอบ URL
+function isValidUrl(string) {
+    try {
+        new URL(string);
+        return true;
+    } catch (_) {
+        return false;
     }
 }
 

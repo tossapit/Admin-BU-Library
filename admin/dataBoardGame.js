@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-import { getFirestore, collection, getDocs, query, orderBy, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, query, orderBy, doc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyCTRAyaI-eBBfWUjMSv1XprKAaIDlacy3g",
@@ -13,6 +13,9 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+
+// เก็บ ID ของการจองที่กำลังแก้ไข/ลบ
+let currentBookingId = null;
 
 async function getBoardGameName(boardGameId) {
     try {
@@ -38,27 +41,21 @@ async function updateBoardGameCount() {
 async function populateBookingTable() {
     try {
         const bookingsRef = collection(db, 'bookingboardgame');
-        // แก้ไขการ query ให้เรียงตาม bbgame_id
-        const q = query(bookingsRef, 
-            orderBy('bbgame_id', 'desc') // เรียงตามหมายเลขการจอง จากมากไปน้อย
-        );
+        const q = query(bookingsRef, orderBy('bbgame_id', 'desc'));
         const querySnapshot = await getDocs(q);
 
         const tbody = document.querySelector('tbody');
         tbody.innerHTML = '';
 
-        // แปลงข้อมูลเป็น array และเรียงลำดับ
         const bookings = querySnapshot.docs.map(doc => ({
             ...doc.data(),
             id: doc.id
         })).sort((a, b) => {
-            // แปลงเป็นตัวเลขเพื่อเรียงลำดับ
             const idA = parseInt(a.bbgame_id) || 0;
             const idB = parseInt(b.bbgame_id) || 0;
-            return idB - idA; // เรียงจากมากไปน้อย
+            return idB - idA;
         });
 
-        // สร้างแถวข้อมูล
         for (const booking of bookings) {
             const row = document.createElement('tr');
             row.innerHTML = `
@@ -68,11 +65,22 @@ async function populateBookingTable() {
                 <td class="py-3 px-4">${booking.player_count || '1'} คน</td>
                 <td class="py-3 px-4">${formatTime(booking.bbgame_time)}</td>
                 <td class="py-3 px-4">${formatDate(booking.bbgame_date)}</td>
+                <td class="py-3 px-4 text-right space-x-2">
+                    <button onclick="openEditModal('${booking.id}')" 
+                        class="text-blue-600 hover:text-blue-900">
+                        <i data-feather="edit-2" class="w-4 h-4"></i>
+                    </button>
+                    <button onclick="openDeleteConfirmModal('${booking.id}')"
+                        class="text-red-600 hover:text-red-900">
+                        <i data-feather="trash-2" class="w-4 h-4"></i>
+                    </button>
+                </td>
             `;
             tbody.appendChild(row);
         }
 
         updateStatistics(querySnapshot.docs);
+        feather.replace();
 
     } catch (error) {
         console.error("Error populating booking table:", error);
@@ -99,6 +107,93 @@ function formatTime(timeString) {
     return `${timeString} น.`;
 }
 
+// Modal functions
+window.openEditModal = async function(bookingId) {
+    currentBookingId = bookingId;
+    const bookingRef = doc(db, 'bookingboardgame', bookingId);
+    const bookingDoc = await getDoc(bookingRef);
+    if (bookingDoc.exists()) {
+        const data = bookingDoc.data();
+        document.getElementById('edit_student_id').value = data.student_id || '';
+        document.getElementById('edit_player_count').value = data.player_count || '1';
+        document.getElementById('edit_time').value = data.bbgame_time || '';
+        document.getElementById('edit_date').value = data.bbgame_date || '';
+    }
+    document.getElementById('editBookingModal').classList.remove('hidden');
+}
+
+window.closeEditModal = function() {
+    document.getElementById('editBookingModal').classList.add('hidden');
+    document.getElementById('editBookingForm').reset();
+    currentBookingId = null;
+}
+
+window.openDeleteConfirmModal = function(bookingId) {
+    currentBookingId = bookingId;
+    document.getElementById('deleteConfirmModal').classList.remove('hidden');
+    document.getElementById('confirmDeleteBtn').onclick = deleteBooking;
+}
+
+window.closeDeleteConfirmModal = function() {
+    document.getElementById('deleteConfirmModal').classList.add('hidden');
+    currentBookingId = null;
+}
+
+async function deleteBooking() {
+    if (!currentBookingId) return;
+    try {
+        await deleteDoc(doc(db, 'bookingboardgame', currentBookingId));
+        closeDeleteConfirmModal();
+        populateBookingTable();
+        alert('ลบข้อมูลสำเร็จ');
+    } catch (error) {
+        console.error('Error:', error);
+        alert('เกิดข้อผิดพลาดในการลบข้อมูล: ' + error.message);
+    }
+}
+
+
+
+// Event Listeners
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize icons
+    feather.replace();
+
+    // Load initial data
+    populateBookingTable();
+    updateBoardGameCount();
+
+    // Setup edit form submission
+    const editForm = document.getElementById('editBookingForm');
+    if (editForm) {
+        editForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentBookingId) return;
+
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+
+            try {
+                const bookingRef = doc(db, 'bookingboardgame', currentBookingId);
+                await updateDoc(bookingRef, {
+                    student_id: document.getElementById('edit_student_id').value,
+                    player_count: parseInt(document.getElementById('edit_player_count').value),
+                    bbgame_time: document.getElementById('edit_time').value,
+                    bbgame_date: document.getElementById('edit_date').value
+                });
+
+                closeEditModal();
+                populateBookingTable();
+                alert('แก้ไขข้อมูลสำเร็จ');
+            } catch (error) {
+                console.error('Error:', error);
+                alert('เกิดข้อผิดพลาด: ' + error.message);
+            } finally {
+                submitBtn.disabled = false;
+            }
+        });
+    }
+});
 window.toggleDropdown = function(dropdownId, event) {
     // ตรวจสอบ parameters
     event = event || window.event;
@@ -149,8 +244,8 @@ function setupDropdowns() {
     });
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
-    await populateBookingTable();
-    await updateBoardGameCount();
+document.addEventListener('DOMContentLoaded', () => {
     feather.replace();
+    loadBoardGames();
+    setupFormSubmission();
 });

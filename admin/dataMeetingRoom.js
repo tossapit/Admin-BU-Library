@@ -45,7 +45,7 @@ async function fetchApprovedBookings() {
                 <td class="py-3 px-4">${booking.status}</td>
                 <td class="py-3 px-4">
                     <button onclick="deleteBooking('${doc.id}')" class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded">
-                        ลบ
+                        สิ้นสุดการใช้งาน
                     </button>
                 </td>
             `;
@@ -66,7 +66,7 @@ window.showDetails = function(bookingId) {
 
 // แก้ไขฟังก์ชัน deleteBooking ใน dataMeetingRoom.js
 window.deleteBooking = async function(bookingId) {
-    if (confirm('คุณต้องการลบการจองนี้หรือไม่?')) {
+    if (confirm('คุณต้องการยืนยันการสิ้นสุดการใช้งานนี้หรือไม่?')) {
         try {
             // ค้นหาห้องที่มี currentBooking ตรงกับ bookingId
             const roomsRef = collection(db, 'meetingRooms');
@@ -86,12 +86,12 @@ window.deleteBooking = async function(bookingId) {
 
             // ลบข้อมูลการจอง
             await deleteDoc(doc(db, 'bookingmeeting', bookingId));
-            alert('ยกเลิกการจองสำเร็จ');
+            alert('สิ้นสุดการใช้งาน');
             fetchApprovedBookings();
             
         } catch (error) {
             console.error("Error in deleteBooking:", error);
-            alert('เกิดข้อผิดพลาดในการยกเลิกการจอง');
+            alert('เกิดข้อผิดพลาดในการสิ้นสุดการใช้งาน');
         }
     }
 };

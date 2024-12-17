@@ -36,7 +36,7 @@ async function loadRooms() {
            <td class="px-6 py-4">${room.floor}</td>
            <td class="px-6 py-4">${formatDate(room.createdAt.toDate())} น.</td>
            <td class="px-6 py-4">
-               <button onclick="deleteRoom('${doc.id}')" class="bg-red-500 hover:bg-red-700 text-white font-medium py-2 px-4 rounded transition-colors duration-200">ลบ</button>
+               <button onclick="deleteRoom('${doc.id}')" class="bg-red-500 hover:bg-red-700 text-white font-medium py-2 px-4 rounded transition-colors duration-200">ลบห้อง</button>
            </td>
        `;
        roomTableBody.appendChild(row);

@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, query, orderBy, limit, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyCTRAyaI-eBBfWUjMSv1XprKAaIDlacy3g",
@@ -47,6 +47,9 @@ async function loadBoardGames() {
                     ${data.quantity}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <button onclick='openEditModal("${doc.id}", ${JSON.stringify(data)})' class="text-blue-600 hover:text-blue-900 mr-2">
+                        <i data-feather="edit-2" class="w-4 h-4"></i>
+                    </button>
                     <button onclick="openDeleteModal('${doc.id}')" class="text-red-600 hover:text-red-900">
                         <i data-feather="trash-2" class="w-4 h-4"></i>
                     </button>
@@ -110,6 +113,49 @@ function setupFormSubmission() {
             await addDoc(collection(db, 'boardgame'), boardgameData);
             alert('บันทึกข้อมูลสำเร็จ');
             closeAddModal();
+            loadBoardGames();
+
+        } catch (error) {
+            console.error('Error:', error);
+            alert('เกิดข้อผิดพลาด: ' + error.message);
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'บันทึก';
+        }
+    });
+}
+
+function setupEditFormSubmission() {
+    const form = document.getElementById('editBoardgameForm');
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'กำลังบันทึก...';
+
+        try {
+            const docId = document.getElementById('edit_doc_id').value;
+            const name_bg = document.getElementById('edit_name_bg').value.trim();
+            const image_url = document.getElementById('edit_image_url').value.trim();
+            const quantity = parseInt(document.getElementById('edit_quantity').value);
+
+            // Validation
+            if (!name_bg) throw new Error('กรุณากรอกชื่อบอร์ดเกม');
+            if (!image_url) throw new Error('กรุณากรอก URL รูปภาพ');
+            if (!isValidUrl(image_url)) throw new Error('กรุณากรอก URL รูปภาพที่ถูกต้อง');
+            if (isNaN(quantity) || quantity < 1) throw new Error('กรุณากรอกจำนวนบอร์ดเกมที่ถูกต้อง');
+
+            const boardgameData = {
+                name_bg,
+                image_url,
+                quantity,
+                updated_at: new Date().toISOString()
+            };
+
+            const docRef = doc(db, 'boardgame', docId);
+            await updateDoc(docRef, boardgameData);
+            alert('บันทึกการแก้ไขสำเร็จ');
+            closeEditModal();
             loadBoardGames();
 
         } catch (error) {
@@ -206,7 +252,8 @@ document.addEventListener('DOMContentLoaded', () => {
     feather.replace();
     loadBoardGames();
     setupFormSubmission();
-
+    setupEditFormSubmission();
+    
     const logoutButton = document.querySelector('.mt-auto');
     logoutButton?.addEventListener('click', handleLogout);
 });

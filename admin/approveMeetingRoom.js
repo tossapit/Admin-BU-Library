@@ -136,7 +136,7 @@ async function approveBooking(bookingId) {
         });
         
         fetchBookings();
-        alert('อนุมัติการจองสำเร็จ');
+        
     } catch (error) {
         console.error("Error approving booking:", error);
         alert('เกิดข้อผิดพลาดในการอนุมัติ');
@@ -169,7 +169,7 @@ async function rejectBooking(bookingId) {
 
         // แทนที่จะใช้ deleteDoc เราแค่ refresh ตารางใหม่
         fetchBookings();
-        alert('ยกเลิกการจองสำเร็จ');
+        
     } catch (error) {
         console.error("Error rejecting booking:", error);
         alert('เกิดข้อผิดพลาดในการยกเลิก');
@@ -211,7 +211,7 @@ window.clearTable = async function() {
                 tbody.innerHTML = '';
             }
             
-            alert('รีเซ็ตคิวสำเร็จ');
+            
         } catch (error) {
             console.error("Error clearing data:", error);
             alert('เกิดข้อผิดพลาดในการลบข้อมูล');

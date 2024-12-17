@@ -86,7 +86,7 @@ window.deleteBooking = async function(bookingId) {
 
             // ลบข้อมูลการจอง
             await deleteDoc(doc(db, 'bookingmeeting', bookingId));
-            alert('สิ้นสุดการใช้งาน');
+            
             fetchApprovedBookings();
             
         } catch (error) {

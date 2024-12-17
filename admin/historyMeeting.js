@@ -85,7 +85,7 @@ window.clearTable = async function() {
                 tbody.innerHTML = '';
             }
             
-            alert('ลบประวัติสำเร็จ');
+            
         } catch (error) {
             console.error("Error clearing data:", error);
             alert('เกิดข้อผิดพลาดในการลบข้อมูล');

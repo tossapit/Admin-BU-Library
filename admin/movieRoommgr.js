@@ -36,7 +36,7 @@ async function loadRooms() {
            <td class="px-6 py-4">${room.floor}</td>
            <td class="px-6 py-4">${formatDate(room.createdAt.toDate())} น.</td>
            <td class="px-6 py-4">
-               <button onclick="deleteRoom('${doc.id}')" class="bg-red-500 hover:bg-red-700 text-white font-medium py-2 px-4 rounded transition-colors duration-200">ลบ</button>
+               <button onclick="deleteRoom('${doc.id}')" class="bg-red-500 hover:bg-red-700 text-white font-medium py-2 px-4 rounded transition-colors duration-200">ลบห้อง</button>
            </td>
        `;
        roomTableBody.appendChild(row);
@@ -57,7 +57,7 @@ document.getElementById('roomForm')?.addEventListener('submit', async (e) => {
                status: 'ว่าง',
                createdAt: new Date()
            });
-           alert('เพิ่มห้องสำเร็จ');
+           
            document.getElementById('roomForm').reset();
            loadRooms();
        } catch (error) {
@@ -70,7 +70,7 @@ window.deleteRoom = async (id) => {
    if (confirm('ต้องการลบห้องนี้หรือไม่?')) {
        try {
            await deleteDoc(doc(db, 'movieRooms', id));
-           alert('ลบห้องสำเร็จ');
+           
            loadRooms();
        } catch (error) {
            alert('เกิดข้อผิดพลาด: ' + error.message);

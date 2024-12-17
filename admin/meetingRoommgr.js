@@ -57,7 +57,7 @@ document.getElementById('roomForm')?.addEventListener('submit', async (e) => {
                status: 'ว่าง',
                createdAt: new Date()
            });
-           alert('เพิ่มห้องสำเร็จ');
+           
            document.getElementById('roomForm').reset();
            loadRooms();
        } catch (error) {
@@ -70,7 +70,7 @@ window.deleteRoom = async (id) => {
    if (confirm('ต้องการลบห้องนี้หรือไม่?')) {
        try {
            await deleteDoc(doc(db, 'meetingRooms', id));
-           alert('ลบห้องสำเร็จ');
+           
            loadRooms();
        } catch (error) {
            alert('เกิดข้อผิดพลาด: ' + error.message);

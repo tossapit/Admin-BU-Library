@@ -22,7 +22,7 @@ async function fetchBookings() {
         const q = query(
             collection(db, 'bookings'),
             where('room_type', '==', 'Movie Room'),
-            where('status', '==', 'รออนุมัติ')  // เพิ่ม condition นี้
+            where('status', '==', 'รออนุมัติ')  
         );
         
         const snapshot = await getDocs(q);
@@ -136,7 +136,7 @@ async function approveBooking(bookingId) {
         });
         
         fetchBookings();
-        alert('อนุมัติการจองสำเร็จ');
+        
     } catch (error) {
         console.error("Error approving booking:", error);
         alert('เกิดข้อผิดพลาดในการอนุมัติ');
@@ -151,7 +151,7 @@ async function rejectBooking(bookingId) {
         if (bookingSnap.exists()) {
             const bookingData = bookingSnap.data();
             
-            // แทนที่จะลบข้อมูล เราจะอัพเดทสถานะเป็น 'ยกเลิก'
+            
             await updateDoc(bookingRef, {
                 status: 'ยกเลิก'
             });
@@ -169,7 +169,7 @@ async function rejectBooking(bookingId) {
 
         // แทนที่จะใช้ deleteDoc เราแค่ refresh ตารางใหม่
         fetchBookings();
-        alert('ยกเลิกการจองสำเร็จ');
+        
     } catch (error) {
         console.error("Error rejecting booking:", error);
         alert('เกิดข้อผิดพลาดในการยกเลิก');
@@ -208,7 +208,7 @@ window.toggleDropdown = function(dropdownId) {
 };
 
 window.clearTable = async function() {
-    if (confirm('คุณต้องการล้างตารางหรือไม่? ข้อมูลจะถูกลบถาวร')) {
+    if (confirm('คุณต้องการที่จะรีเซ็ตคิวใช่หรือไม่?')) {
         try {
             const q = query(collection(db, 'bookings'), where('room_type', '==', 'Movie Room'));
             const snapshot = await getDocs(q);
@@ -221,7 +221,7 @@ window.clearTable = async function() {
                 tbody.innerHTML = '';
             }
             
-            alert('ลบข้อมูลสำเร็จ');
+            
         } catch (error) {
             console.error("Error clearing data:", error);
             alert('เกิดข้อผิดพลาดในการลบข้อมูล');

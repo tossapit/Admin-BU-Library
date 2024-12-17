@@ -72,7 +72,7 @@ window.toggleDropdown = function(dropdownId, event) {
 };
 
 window.clearTable = async function() {
-    if (confirm('คุณต้องการล้างตารางหรือไม่? ข้อมูลจะถูกลบถาวร')) {
+    if (confirm('คุณต้องการลบประวัติการจองใช่หรือไม่?')) {
         try {
             const q = query(collection(db, 'historymeeting'), where('room_type', '==', 'Meeting Room'));
             const snapshot = await getDocs(q);
@@ -85,7 +85,7 @@ window.clearTable = async function() {
                 tbody.innerHTML = '';
             }
             
-            alert('ลบข้อมูลสำเร็จ');
+            alert('ลบประวัติสำเร็จ');
         } catch (error) {
             console.error("Error clearing data:", error);
             alert('เกิดข้อผิดพลาดในการลบข้อมูล');

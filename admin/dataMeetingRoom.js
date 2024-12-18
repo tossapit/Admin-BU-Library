@@ -20,6 +20,11 @@ function handleLogout() {
     }
 }
 
+function formatTime(timeString) {
+    if (!timeString) return '-';
+    return `${timeString} น.`;
+}
+
 async function fetchApprovedBookings() {
     const bookingsTable = document.querySelector('table tbody');
     if (!bookingsTable) return;
@@ -41,6 +46,7 @@ async function fetchApprovedBookings() {
                 <td class="py-3 px-4">#${doc.id}</td>
                 <td class="py-3 px-4">${booking.mainBooker}</td>
                 <td class="py-3 px-4">${booking.room_type}</td>
+                <td class="py-3 px-4">${formatTime(booking.booking_time)}</td>
                 <td class="py-3 px-4">${new Date(booking.created_at).toLocaleDateString("th-TH")}</td>
                 <td class="py-3 px-4">${booking.status}</td>
                 <td class="py-3 px-4">

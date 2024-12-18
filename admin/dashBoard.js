@@ -144,7 +144,8 @@ async function updateNotificationBadges() {
     try {
         // Check Movie Room notifications
         const movieQuery = query(
-            collection(db, 'bookingmovie'),
+            collection(db, 'bookings'),
+            where('room_type', '==', 'Movie Room'),
             where('status', '==', 'รออนุมัติ')
         );
         
@@ -177,7 +178,8 @@ async function updateNotificationBadges() {
         
         // Check Meeting Room notifications (เพิ่มเติม)
         const meetingQuery = query(
-            collection(db, 'bookingmeeting'),
+            collection(db, 'bookings'),
+            where('room_type', '==', 'Meeting Room'),
             where('status', '==', 'รออนุมัติ')
         );
         

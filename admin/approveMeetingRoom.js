@@ -14,6 +14,11 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+function formatTime(timeString) {
+    if (!timeString) return '-';
+    return `${timeString} น.`;
+}
+
 async function fetchBookings() {
     const bookingsTable = document.querySelector('table tbody');
     if (!bookingsTable) return;
@@ -22,7 +27,7 @@ async function fetchBookings() {
         const q = query(
             collection(db, 'bookings'),
             where('room_type', '==', 'Meeting Room'),
-            where('status', '==', 'รออนุมัติ')  // เพิ่ม condition นี้
+            where('status', '==', 'รออนุมัติ')
         );
         
         const snapshot = await getDocs(q);
@@ -35,6 +40,7 @@ async function fetchBookings() {
                 <td class="py-3 px-4">#${doc.id}</td>
                 <td class="py-3 px-4">${booking.mainBooker}</td>
                 <td class="py-3 px-4">${booking.room_type}</td>
+                <td class="py-3 px-4">${formatTime(booking.booking_time)}</td>
                 <td class="py-3 px-4">${new Date(booking.created_at).toLocaleDateString('th-TH')}</td>
                 <td class="py-3 px-4">${booking.status}</td>
                 <td class="py-3 px-4">
@@ -56,7 +62,6 @@ async function fetchBookings() {
     }
 }
 
-// เพิ่มฟังก์ชันนี้ก่อน async function approveBooking(bookingId)
 async function findAvailableRoom() {
     try {
         const roomsRef = collection(db, 'meetingRooms');
@@ -107,7 +112,8 @@ async function approveBooking(bookingId) {
         const bookingData = bookingSnap.data();
 
         await updateDoc(bookingRef, { 
-            status: 'อนุมัติ' 
+            status: 'อนุมัติ',
+            booking_time: bookingData.booking_time || new Date().toLocaleTimeString('th-TH')
         });
 
         const roomRef = doc(db, 'meetingRooms', availableRoom.id);
@@ -117,22 +123,20 @@ async function approveBooking(bookingId) {
             lastUpdated: new Date().toISOString()
         });
 
-        // Add to bookingmeeting collection
-        const bookingMeetingRef = doc(db, 'bookingmeeting', bookingId);
-        await setDoc(bookingMeetingRef, {
+        await setDoc(doc(db, 'bookingmeeting', bookingId), {
             ...bookingData,
             status: 'อนุมัติ',
-            approved_at: new Date().toISOString()
+            approved_at: new Date().toISOString(),
+            booking_time: bookingData.booking_time || new Date().toLocaleTimeString('th-TH')
         });
 
-        // Add to historymeeting collection
-        const historyMeetingRef = doc(db, 'historymeeting', bookingId);
-        await setDoc(historyMeetingRef, {
+        await setDoc(doc(db, 'historymeeting', bookingId), {
             ...bookingData,
             status: 'อนุมัติ',
             approved_at: new Date().toISOString(),
             action: 'อนุมัติการจอง',
-            action_at: new Date().toISOString()
+            action_at: new Date().toISOString(),
+            booking_time: bookingData.booking_time || new Date().toLocaleTimeString('th-TH')
         });
         
         fetchBookings();
@@ -151,23 +155,20 @@ async function rejectBooking(bookingId) {
         if (bookingSnap.exists()) {
             const bookingData = bookingSnap.data();
             
-            // แทนที่จะลบข้อมูล เราจะอัพเดทสถานะเป็น 'ยกเลิก'
             await updateDoc(bookingRef, {
                 status: 'ยกเลิก'
             });
             
-            // เพิ่มข้อมูลในประวัติการจอง
-            const historyMeetingRef = doc(db, 'historymeeting', bookingId);
-            await setDoc(historyMeetingRef, {
+            await setDoc(doc(db, 'historymeeting', bookingId), {
                 ...bookingData,
                 status: 'ยกเลิก',
                 rejected_at: new Date().toISOString(),
                 action: 'ยกเลิกการจอง',
-                action_at: new Date().toISOString()
+                action_at: new Date().toISOString(),
+                booking_time: bookingData.booking_time || new Date().toLocaleTimeString('th-TH')
             });
         }
-
-        // แทนที่จะใช้ deleteDoc เราแค่ refresh ตารางใหม่
+        
         fetchBookings();
         
     } catch (error) {
@@ -176,7 +177,6 @@ async function rejectBooking(bookingId) {
     }
 }
 
-// ฟังก์ชันสำหรับ toggle dropdown
 window.toggleDropdown = function(dropdownId, event) {
     const dropdown = document.getElementById(dropdownId);
     if (!dropdown) return;
@@ -184,16 +184,13 @@ window.toggleDropdown = function(dropdownId, event) {
     const button = event.currentTarget;
     const icon = button.querySelector('[data-feather="chevron-down"]');
     
-    // Toggle dropdown
     dropdown.classList.toggle('hidden');
     
-    // Rotate icon
     if (icon) {
         icon.style.transform = dropdown.classList.contains('hidden') ? 
             'rotate(0deg)' : 'rotate(180deg)';
     }
 
-    // Re-render Feather icons
     feather.replace();
 };
 
@@ -210,7 +207,6 @@ window.clearTable = async function() {
             if (tbody) {
                 tbody.innerHTML = '';
             }
-            
             
         } catch (error) {
             console.error("Error clearing data:", error);
@@ -237,7 +233,6 @@ async function updateNotificationBadges() {
             if (meetingCount > 0) {
                 meetingBadge.textContent = meetingCount;
                 meetingBadge.classList.remove('hidden');
-                // เปิด dropdown เมื่อมีการแจ้งเตือนใหม่
                 if (meetingBadge.dataset.prevCount === undefined || 
                     parseInt(meetingBadge.dataset.prevCount) < meetingCount) {
                     meetingDropdown.classList.remove('hidden');
@@ -271,7 +266,6 @@ async function updateNotificationBadges() {
             if (movieCount > 0) {
                 movieBadge.textContent = movieCount;
                 movieBadge.classList.remove('hidden');
-                // เปิด dropdown เมื่อมีการแจ้งเตือนใหม่
                 if (movieBadge.dataset.prevCount === undefined || 
                     parseInt(movieBadge.dataset.prevCount) < movieCount) {
                     movieDropdown.classList.remove('hidden');
@@ -293,9 +287,7 @@ async function updateNotificationBadges() {
     }
 }
 
-// Setup dropdowns when the page loads
 function setupDropdowns() {
-    // Meeting Room dropdown is always open by default (since this is the meeting room page)
     const meetingRoomDropdown = document.getElementById('meetingRoomDropdown');
     if (meetingRoomDropdown) {
         meetingRoomDropdown.classList.remove('hidden');
@@ -313,7 +305,6 @@ function handleLogout() {
     }
 }
 
-// Initialize page
 document.addEventListener('DOMContentLoaded', () => {
     feather.replace();
     setupDropdowns();

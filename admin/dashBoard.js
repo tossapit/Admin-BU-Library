@@ -333,6 +333,7 @@ async function updateBookingTable() {
             }
         }
 
+        // รวบรวมข้อมูลการจองห้องประชุม
         meetingHistory.forEach(doc => {
             const data = doc.data();
             const key = getGroupKey(data.created_at, groupByFormat);
@@ -342,6 +343,7 @@ async function updateBookingTable() {
             bookingData.get(key).meeting++;
         });
 
+        // รวบรวมข้อมูลการจองห้องดูหนัง
         movieHistory.forEach(doc => {
             const data = doc.data();
             const key = getGroupKey(data.created_at, groupByFormat);
@@ -361,11 +363,22 @@ async function updateBookingTable() {
             bookingData.get(key).boardgame++;
         });
 
-        // แสดงผลในตาราง
+        // เรียงข้อมูลตามวันที่
         const sortedData = Array.from(bookingData.entries())
             .sort(([,a], [,b]) => b.date - a.date);
 
+        // คำนวณผลรวมทั้งหมด
+        let totalMeeting = 0;
+        let totalMovie = 0;
+        let totalBoardGame = 0;
+
+        // แสดงผลในตาราง
         sortedData.forEach(([key, data]) => {
+            // เพิ่มค่าให้ผลรวม
+            totalMeeting += data.meeting;
+            totalMovie += data.movie;
+            totalBoardGame += data.boardgame;
+
             const row = document.createElement('tr');
             const total = data.meeting + data.movie + data.boardgame;
             row.innerHTML = `
@@ -377,6 +390,12 @@ async function updateBookingTable() {
             `;
             tableBody.appendChild(row);
         });
+
+        // อัพเดทผลรวมในส่วน footer
+        document.getElementById('totalMeeting').textContent = totalMeeting;
+        document.getElementById('totalMovie').textContent = totalMovie;
+        document.getElementById('totalBoardGame').textContent = totalBoardGame;
+        document.getElementById('grandTotal').textContent = totalMeeting + totalMovie + totalBoardGame;
 
     } catch (error) {
         console.error("Error updating booking table:", error);

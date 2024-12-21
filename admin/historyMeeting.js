@@ -13,21 +13,35 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-async function fetchBookingHistory() {
+let allBookings = [];
+
+async function fetchBookingHistory(searchTerm = '') {
     const bookingsTable = document.querySelector('table tbody');
     if (!bookingsTable) return;
     
     try {
-        const q = query(collection(db, 'historymeeting'), where('room_type', '==', 'Meeting Room'));
-        const snapshot = await getDocs(q);
+        
+        if (allBookings.length === 0) {
+            const q = query(collection(db, 'historymeeting'), where('room_type', '==', 'Meeting Room'));
+            const snapshot = await getDocs(q);
+            allBookings = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+        }
+
+        
+        const filteredBookings = searchTerm 
+            ? allBookings.filter(booking => 
+                booking.mainBooker.toLowerCase().includes(searchTerm.toLowerCase()))
+            : allBookings;
         
         bookingsTable.innerHTML = '';
         
-        snapshot.forEach((doc) => {
-            const booking = doc.data();
+        filteredBookings.forEach((booking) => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td class="px-6 py-4 text-sm text-gray-900">#${doc.id}</td>
+                <td class="px-6 py-4 text-sm text-gray-900">#${booking.id}</td>
                 <td class="px-6 py-4 text-sm text-gray-900">${booking.mainBooker}</td>
                 <td class="px-6 py-4 text-sm text-gray-900">${booking.room_type}</td>
                 <td class="px-6 py-4 text-sm text-gray-900">${new Date(booking.created_at).toLocaleDateString('th-TH')}</td>
@@ -44,6 +58,19 @@ async function fetchBookingHistory() {
     } catch (error) {
         console.error("Error fetching booking history:", error);
         alert('เกิดข้อผิดพลาดในการดึงข้อมูล');
+    }
+}
+
+function setupSearch() {
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        let debounceTimer;
+        searchInput.addEventListener('input', (e) => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                fetchBookingHistory(e.target.value);
+            }, 300);
+        });
     }
 }
 
@@ -199,6 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
     feather.replace();
     setupInitialDropdowns();
     fetchBookingHistory();
+    setupSearch();
     updateNotificationBadges();
 
     const logoutButton = document.querySelector('.mt-auto');

@@ -35,6 +35,7 @@ async function fetchApprovedBookings() {
                 <td class="py-3 px-4">#${doc.id}</td>
                 <td class="py-3 px-4">${booking.mainBooker}</td>
                 <td class="py-3 px-4">${booking.room_type}</td>
+                <td class="py-3 px-4">${booking.approved_at ? new Date(booking.approved_at).toLocaleTimeString('th-TH') + ' น.' : '-'}</td>
                 <td class="py-3 px-4">${new Date(booking.created_at).toLocaleDateString("th-TH")}</td>
                 <td class="py-3 px-4">${booking.status}</td>
                 <td class="py-3 px-4">

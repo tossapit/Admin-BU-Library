@@ -194,6 +194,41 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+// เพิ่มฟังก์ชัน handleSearch
+function handleSearch(searchTerm) {
+    const tbody = document.querySelector('tbody');
+    const rows = tbody.getElementsByTagName('tr');
+
+    for (const row of rows) {
+        const gameNameCell = row.getElementsByTagName('td')[2]; // ช่องที่ 3 คือชื่อบอร์ดเกม
+        if (gameNameCell) {
+            const gameName = gameNameCell.textContent || gameNameCell.innerText;
+            if (gameName.toLowerCase().includes(searchTerm.toLowerCase())) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        }
+    }
+}
+
+// ในส่วน DOMContentLoaded เพิ่มการติดตั้ง event listener สำหรับ search
+document.addEventListener('DOMContentLoaded', () => {
+    // โค้ดเดิมที่มีอยู่...
+    
+    // เพิ่ม search event listener
+    const searchInput = document.getElementById('boardGameSearch');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            handleSearch(e.target.value);
+        });
+    }
+
+    // ต้องเรียก feather.replace() อีกครั้งเพื่อให้ icon แสดงผล
+    feather.replace();
+});
+
 window.toggleDropdown = function(dropdownId, event) {
     // ตรวจสอบ parameters
     event = event || window.event;

@@ -79,6 +79,21 @@
     <div class="ml-[280px] p-6 w-full">
         <h2 class="text-2xl font-semibold text-gray-800 mb-4">Admin - รายการข้อมูลการจองบอร์ดเกม</h2>
 
+        <!-- เพิ่มหลังจาก <h2> และก่อน Board Game Overview Section -->
+<div class="mb-6">
+    <div class="relative max-w-md">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <i data-feather="search" class="h-5 w-5 text-gray-400"></i>
+        </div>
+        <input
+            type="text"
+            id="boardGameSearch"
+            class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="ค้นหาบอร์ดเกม..."
+        />
+    </div>
+</div>
+
         <!-- Board Game Overview Section -->
         <div class="grid grid-cols-3 gap-4 mb-6">
             <div class="bg-white p-4 rounded-lg shadow">
